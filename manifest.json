@@ -2,7 +2,7 @@
   "name": "OCC Inventory",
   "short_name": "OCC Inventory",
   "description": "Old Chatham Creamery Inventory System",
-  "start_url": "/?inventory",
+  "start_url": "/OCC-Inventory/?inventory",
   "display": "fullscreen",
   "background_color": "#F9F5EE",
   "theme_color": "#2C4A2E",
