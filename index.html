@@ -921,7 +921,7 @@ function openQRModal(id){
   wrap.innerHTML='';
   document.getElementById('qr-modal').classList.add('show');
   // Encode compact JSON — short enough for any QR scanner
-  var payload='https://radiant-profiterole-0ccce3.netlify.app/#scan-'+item.id;
+  var payload='https://jcotnoir-occ.github.io/occ-inventory/#scan-'+item.id;
   setTimeout(function(){
     try{
       new QRCode(wrap,{text:payload,width:220,height:220,colorDark:'#2C4A2E',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
@@ -1566,7 +1566,7 @@ function printSelectedQRCodes(){
     var wrap=document.createElement('div');
     wrap.style.cssText='width:160px;height:160px;';
     container.appendChild(wrap);
-    var url='https://radiant-profiterole-0ccce3.netlify.app/#scan-'+item.id;
+    var url='https://jcotnoir-occ.github.io/occ-inventory/#scan-'+item.id;
     try{
       new QRCode(wrap,{text:url,width:160,height:160,colorDark:'#2C4A2E',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
     }catch(e){}
