@@ -792,19 +792,40 @@ function startPolling(){
     if(document.getElementById('scan-overlay').style.display==='block') return;
     try{
       var rows=await sbFetch();
-      if(!rows||!rows.length) return;
+      if(!rows) return;
       var changed=false;
-      rows.forEach(function(row){
-        var local=inventoryData.find(function(r){return r.id===row.id;});
-        if(local && local.stock!==row.stock){
-          local.stock=row.stock;
+
+      // Check for deleted items — remove any local items not in Supabase
+      for(var i=inventoryData.length-1;i>=0;i--){
+        var stillExists=rows.find(function(r){return r.id===inventoryData[i].id;});
+        if(!stillExists){
+          inventoryData.splice(i,1);
           changed=true;
         }
+      }
+
+      // Check for new items — add any Supabase items not local
+      rows.forEach(function(row){
+        var local=inventoryData.find(function(r){return r.id===row.id;});
+        if(!local){
+          inventoryData.push(row);
+          changed=true;
+        } else {
+          // Check for any field changes, not just stock
+          ['stock','threshLow','threshCrit','loc','bin','name','company','itemNum','machine'].forEach(function(f){
+            if(local[f]!==row[f]){ local[f]=row[f]; changed=true; }
+          });
+        }
       });
+
       if(changed){
         lsSave();
         filterTable();
         updateCounts();
+        // If full inventory panel is open, refresh it too
+        if(document.getElementById('scan-inv-panel').style.display==='block'){
+          renderScanInventory(inventoryData);
+        }
       }
     }catch(e){ /* silent fail — offline */ }
   }, 5000);
@@ -921,7 +942,7 @@ function openQRModal(id){
   wrap.innerHTML='';
   document.getElementById('qr-modal').classList.add('show');
   // Encode compact JSON — short enough for any QR scanner
-  var payload='https://radiant-profiterole-0ccce3.netlify.app/#scan-'+item.id;
+  var payload='https://jcotnoir-occ.github.io/OCC-Inventory/#scan-'+item.id;
   setTimeout(function(){
     try{
       new QRCode(wrap,{text:payload,width:220,height:220,colorDark:'#2C4A2E',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
@@ -1566,7 +1587,7 @@ function printSelectedQRCodes(){
     var wrap=document.createElement('div');
     wrap.style.cssText='width:160px;height:160px;';
     container.appendChild(wrap);
-    var url='https://radiant-profiterole-0ccce3.netlify.app/#scan-'+item.id;
+    var url='https://jcotnoir-occ.github.io/OCC-Inventory/#scan-'+item.id;
     try{
       new QRCode(wrap,{text:url,width:160,height:160,colorDark:'#2C4A2E',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
     }catch(e){}
@@ -1695,15 +1716,26 @@ function addItemFromPanel(){
     bin:document.getElementById('pi-bin').value,
   };
   inventoryData.push(newItem);
-  saveInventory(newItem);
+  lsSave();
   updateCounts();
-  showPanelFeedback('\u2713 "'+name+'" added!','success');
+  renderScanInventory(inventoryData);
+  showPanelFeedback('\u2713 Saving...','success');
+  // Directly upsert to Supabase and confirm
+  if(useSupabase){
+    sbUpsert(newItem)
+      .then(function(){
+        showPanelFeedback('\u2713 "'+name+'" added and synced!','success');
+      })
+      .catch(function(e){
+        showPanelFeedback('\u26a0 Saved locally but sync failed: '+e.message,'error');
+      });
+  } else {
+    showPanelFeedback('\u2713 "'+name+'" added!','success');
+  }
   ['pi-name','pi-company','pi-itemnum','pi-machine','pi-stock','pi-max','pi-low','pi-crit','pi-bin'].forEach(function(id){
     var el=document.getElementById(id); if(el) el.value='';
   });
   document.getElementById('pi-loc').value='';
-  // Refresh inventory list
-  renderScanInventory(inventoryData);
 }
 
 function showPanelFeedback(msg,type){
@@ -1903,7 +1935,9 @@ function addItem(){
     loc:document.getElementById('new-loc').value,
     bin:document.getElementById('new-bin').value,
   });
-  saveInventory(inventoryData[inventoryData.length-1]);
+  var _newItem=inventoryData[inventoryData.length-1];
+  lsSave();
+  if(useSupabase){ sbUpsert(_newItem).catch(function(e){console.error('sync error',e);}); }
   filterTable();
   closeModal('add-modal');
   ['new-name','new-company','new-itemnum','new-machine','new-stock','new-thresh-low','new-thresh-crit','new-bin'].forEach(function(id){document.getElementById(id).value='';});
