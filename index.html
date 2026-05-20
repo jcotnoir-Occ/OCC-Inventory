@@ -792,19 +792,40 @@ function startPolling(){
     if(document.getElementById('scan-overlay').style.display==='block') return;
     try{
       var rows=await sbFetch();
-      if(!rows||!rows.length) return;
+      if(!rows) return;
       var changed=false;
-      rows.forEach(function(row){
-        var local=inventoryData.find(function(r){return r.id===row.id;});
-        if(local && local.stock!==row.stock){
-          local.stock=row.stock;
+
+      // Check for deleted items — remove any local items not in Supabase
+      for(var i=inventoryData.length-1;i>=0;i--){
+        var stillExists=rows.find(function(r){return r.id===inventoryData[i].id;});
+        if(!stillExists){
+          inventoryData.splice(i,1);
           changed=true;
         }
+      }
+
+      // Check for new items — add any Supabase items not local
+      rows.forEach(function(row){
+        var local=inventoryData.find(function(r){return r.id===row.id;});
+        if(!local){
+          inventoryData.push(row);
+          changed=true;
+        } else {
+          // Check for any field changes, not just stock
+          ['stock','threshLow','threshCrit','loc','bin','name','company','itemNum','machine'].forEach(function(f){
+            if(local[f]!==row[f]){ local[f]=row[f]; changed=true; }
+          });
+        }
       });
+
       if(changed){
         lsSave();
         filterTable();
         updateCounts();
+        // If full inventory panel is open, refresh it too
+        if(document.getElementById('scan-inv-panel').style.display==='block'){
+          renderScanInventory(inventoryData);
+        }
       }
     }catch(e){ /* silent fail — offline */ }
   }, 5000);
