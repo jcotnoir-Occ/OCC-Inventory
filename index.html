@@ -793,6 +793,7 @@ function startPolling(){
     try{
       var rows=await sbFetch();
       if(!rows) return;
+      // rows can be empty array if all deleted — that is valid
       var changed=false;
 
       // Check for deleted items — remove any local items not in Supabase
@@ -1716,15 +1717,26 @@ function addItemFromPanel(){
     bin:document.getElementById('pi-bin').value,
   };
   inventoryData.push(newItem);
-  saveInventory(newItem);
+  lsSave();
   updateCounts();
-  showPanelFeedback('\u2713 "'+name+'" added!','success');
+  renderScanInventory(inventoryData);
+  showPanelFeedback('\u2713 Saving...','success');
+  // Directly upsert to Supabase and confirm
+  if(useSupabase){
+    sbUpsert(newItem)
+      .then(function(){
+        showPanelFeedback('\u2713 "'+name+'" added and synced!','success');
+      })
+      .catch(function(e){
+        showPanelFeedback('\u26a0 Saved locally but sync failed: '+e.message,'error');
+      });
+  } else {
+    showPanelFeedback('\u2713 "'+name+'" added!','success');
+  }
   ['pi-name','pi-company','pi-itemnum','pi-machine','pi-stock','pi-max','pi-low','pi-crit','pi-bin'].forEach(function(id){
     var el=document.getElementById(id); if(el) el.value='';
   });
   document.getElementById('pi-loc').value='';
-  // Refresh inventory list
-  renderScanInventory(inventoryData);
 }
 
 function showPanelFeedback(msg,type){
@@ -1900,9 +1912,15 @@ function confirmDelete(){
   var delId=deletingId;
   if(idx>-1) inventoryData.splice(idx,1);
   closeModal('delete-modal');
-  saveInventory(null,delId);
+  lsSave();
   filterTable();
   updateCounts();
+  // Directly delete from Supabase so other devices see it immediately
+  if(useSupabase){
+    sbDelete(delId)
+      .then(function(){ setSyncStatus('ok'); setTimeout(function(){ setSyncStatus('idle'); },2000); })
+      .catch(function(e){ console.error('delete sync error',e); setSyncStatus('error','Delete sync failed'); });
+  }
 }
 
 function addItem(){
@@ -1924,7 +1942,9 @@ function addItem(){
     loc:document.getElementById('new-loc').value,
     bin:document.getElementById('new-bin').value,
   });
-  saveInventory(inventoryData[inventoryData.length-1]);
+  var _newItem=inventoryData[inventoryData.length-1];
+  lsSave();
+  if(useSupabase){ sbUpsert(_newItem).catch(function(e){console.error('sync error',e);}); }
   filterTable();
   closeModal('add-modal');
   ['new-name','new-company','new-itemnum','new-machine','new-stock','new-thresh-low','new-thresh-crit','new-bin'].forEach(function(id){document.getElementById(id).value='';});
