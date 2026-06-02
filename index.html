@@ -176,7 +176,15 @@
 
     .page{display:none;}
     .page.active{display:block;}
-  </style>
+  
+@media (max-width: 480px) {
+  .form-row-2 {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+}
+
+</style>
 </head>
 <body>
 <div class="app-root">
@@ -332,11 +340,11 @@
       <div class="panel" style="margin-bottom:18px;">
         <div class="panel-header"><div class="panel-title"><i class="ti ti-pencil"></i> Log Maintenance</div></div>
         <div style="padding:16px 18px;">
-          <div class="form-row-2">
+          <div class="form-row-2" style="gap:14px;margin-bottom:14px;">
             <div><label class="form-label">Date</label><input class="form-input" type="date" id="maint-entry-date"></div>
             <div><label class="form-label">Technician</label><input class="form-input" type="text" id="maint-entry-tech" placeholder="Your name"></div>
           </div>
-          <div class="form-row-2">
+          <div class="form-row-2" style="gap:14px;margin-bottom:14px;">
             <div><label class="form-label">Type</label>
               <select class="form-input" id="maint-entry-type">
                 <option value="routine">Routine Maintenance</option>
@@ -733,12 +741,12 @@
       </div>
       <div style="background:#F5F0E8;border:1px solid rgba(44,74,46,.18);border-radius:10px;padding:14px;margin-bottom:14px;">
         <div style="font-family:'Playfair Display',Georgia,serif;font-size:14px;font-weight:600;color:#2C4A2E;margin-bottom:12px;">Log Maintenance</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-          <div><label style="display:block;font-size:10px;color:#7A7568;text-transform:uppercase;letter-spacing:.09em;font-family:monospace;margin-bottom:4px;">Date</label><input type="date" id="tablet-maint-date" style="width:100%;padding:10px;border:1px solid rgba(44,74,46,.3);border-radius:8px;background:#fff;font-size:14px;color:#2E2E2C;outline:none;"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+          <div><label style="display:block;font-size:10px;color:#7A7568;text-transform:uppercase;letter-spacing:.09em;font-family:monospace;margin-bottom:6px;">Date</label><input type="date" id="tablet-maint-date" style="width:100%;padding:10px;border:1px solid rgba(44,74,46,.3);border-radius:8px;background:#fff;font-size:14px;color:#2E2E2C;outline:none;"></div>
           <div><label style="display:block;font-size:10px;color:#7A7568;text-transform:uppercase;letter-spacing:.09em;font-family:monospace;margin-bottom:4px;">Technician</label><input type="text" id="tablet-maint-tech" placeholder="Your name" style="width:100%;padding:10px;border:1px solid rgba(44,74,46,.3);border-radius:8px;background:#fff;font-size:14px;color:#2E2E2C;outline:none;"></div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-          <div><label style="display:block;font-size:10px;color:#7A7568;text-transform:uppercase;letter-spacing:.09em;font-family:monospace;margin-bottom:4px;">Type</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+          <div><label style="display:block;font-size:10px;color:#7A7568;text-transform:uppercase;letter-spacing:.09em;font-family:monospace;margin-bottom:6px;">Type</label>
             <select id="tablet-maint-type" style="width:100%;padding:10px;border:1px solid rgba(44,74,46,.3);border-radius:8px;background:#fff;font-size:14px;color:#2E2E2C;outline:none;">
               <option value="routine">Routine Maintenance</option>
               <option value="repair">Repair</option>
@@ -749,7 +757,7 @@
           </div>
           <div><label style="display:block;font-size:10px;color:#7A7568;text-transform:uppercase;letter-spacing:.09em;font-family:monospace;margin-bottom:4px;">Parts (optional)</label><input type="text" id="tablet-maint-parts" placeholder="e.g. Filter, O-ring" style="width:100%;padding:10px;border:1px solid rgba(44,74,46,.3);border-radius:8px;background:#fff;font-size:14px;color:#2E2E2C;outline:none;"></div>
         </div>
-        <div style="margin-bottom:12px;"><label style="display:block;font-size:10px;color:#7A7568;text-transform:uppercase;letter-spacing:.09em;font-family:monospace;margin-bottom:4px;">Work Performed *</label>
+        <div style="margin-bottom:16px;"><label style="display:block;font-size:10px;color:#7A7568;text-transform:uppercase;letter-spacing:.09em;font-family:monospace;margin-bottom:6px;">Work Performed *</label>
           <textarea id="tablet-maint-work" rows="3" placeholder="Describe the work done..." style="width:100%;padding:10px;border:1px solid rgba(44,74,46,.3);border-radius:8px;background:#fff;font-size:14px;color:#2E2E2C;outline:none;resize:vertical;font-family:Georgia,serif;"></textarea>
         </div>
         <button onclick="tabletMaintAddEntry()" style="width:100%;padding:14px;background:#C4922A;color:#1A1A18;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;">Save Entry</button>
