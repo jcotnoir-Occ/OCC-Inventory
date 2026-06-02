@@ -1883,6 +1883,9 @@ function showInvSection(section){
     if(cur) sel.value=cur;
     document.getElementById('pi-feedback').style.display='none';
   }
+  if(section==='maint'){
+    tabletMaintRenderMachines();
+  }
 }
 
 function addItemFromPanel(){
