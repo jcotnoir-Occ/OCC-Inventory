@@ -2397,7 +2397,6 @@ if(window.location.search.indexOf('inventory')!==-1){
 // MAINTENANCE MODULE
 // ================================================================
 var MAINT_SB_URL = 'https://otlkjzaaogczcrszcogm.supabase.co';
-var MAINT_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90bGtqemFhb2djenJzemNvZ20iLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0NzI1NjQ3NCwiZXhwIjoyMDYyODMyNDc0fQ.3C_HmxMbqajjTHVUoJB6Ej95rqVmqNi5s4JbLAqFKVA';
 var MAINT_BASE   = 'https://jcotnoir-occ.github.io/OCC-Inventory/';
 
 var maintMachines = [];
@@ -2423,8 +2422,8 @@ function maintLoadLocal() {
 function maintSbFetch(path, opts) {
   opts = opts || {};
   var headers = {
-    'apikey': MAINT_SB_KEY,
-    'Authorization': 'Bearer ' + MAINT_SB_KEY,
+    'apikey': SUPABASE_KEY,
+    'Authorization': 'Bearer ' + SUPABASE_KEY,
     'Content-Type': 'application/json',
     'Prefer': 'return=representation'
   };
