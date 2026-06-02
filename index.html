@@ -492,6 +492,7 @@
       <button onclick="showInvSection('list')" id="inv-panel-tab-list" style="flex:1;padding:8px;background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.4);border-radius:6px;color:#F5F0E8;font-size:13px;font-weight:600;cursor:pointer;font-family:Georgia,serif;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="ti ti-list" style="font-size:14px;"></i> Inventory</button>
       <button onclick="showInvSection('scan')" id="inv-panel-tab-scan" style="flex:1;padding:8px;background:transparent;border:1px solid rgba(255,255,255,.3);border-radius:6px;color:rgba(255,255,255,.7);font-size:13px;cursor:pointer;font-family:Georgia,serif;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="ti ti-scan" style="font-size:14px;"></i> Scan QR</button>
       <button onclick="showInvSection('add')" id="inv-panel-tab-add" style="flex:1;padding:8px;background:transparent;border:1px solid rgba(255,255,255,.3);border-radius:6px;color:rgba(255,255,255,.7);font-size:13px;cursor:pointer;font-family:Georgia,serif;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="ti ti-circle-plus" style="font-size:14px;"></i> Add Item</button>
+      <button onclick="showInvSection('maint')" id="inv-panel-tab-maint" style="flex:1;padding:8px;background:transparent;border:1px solid rgba(255,255,255,.3);border-radius:6px;color:rgba(255,255,255,.7);font-size:13px;cursor:pointer;font-family:Georgia,serif;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="ti ti-tool" style="font-size:14px;"></i> Maintenance</button>
     </div>
   </div>
   <!-- INVENTORY LIST SECTION -->
@@ -693,6 +694,70 @@
     <div class="modal-body" id="stock-popup-body" style="max-height:60vh;overflow-y:auto;padding:0 20px;"></div>
     <div class="modal-footer">
       <button class="btn-save" onclick="closeModal('stock-popup-modal')">Close</button>
+    </div>
+  </div>
+
+  <!-- MAINTENANCE SECTION (tablet) -->
+  <div id="inv-section-maint" style="display:none;padding:14px;">
+
+    <div id="tablet-maint-home">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px;flex-wrap:wrap;">
+        <div style="font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:600;color:#2C4A2E;">Machines</div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="maintOpenScanner()" style="padding:8px 12px;background:#2C4A2E;color:#F5F0E8;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;"><i class="ti ti-scan"></i> Scan</button>
+          <button onclick="maintShowAddMachineModal()" style="padding:8px 12px;background:#C4922A;color:#1A1A18;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;"><i class="ti ti-plus"></i> Add Machine</button>
+        </div>
+      </div>
+      <div id="tablet-maint-machines-grid" style="display:flex;flex-direction:column;gap:10px;"></div>
+    </div>
+
+    <div id="tablet-maint-log-view" style="display:none;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <button onclick="tabletMaintShowHome()" style="background:#EAF0EA;border:1px solid rgba(44,74,46,.3);border-radius:6px;padding:8px 12px;font-size:13px;cursor:pointer;color:#2C4A2E;display:flex;align-items:center;gap:5px;"><i class="ti ti-arrow-left"></i> Back</button>
+        <div id="tablet-maint-machine-name" style="font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:600;color:#2C4A2E;flex:1;"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
+        <div style="background:#F5F0E8;border:1px solid rgba(44,74,46,.18);border-radius:8px;padding:10px;text-align:center;border-top:3px solid #2C4A2E;">
+          <div style="font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;color:#1A1A18;" id="tablet-maint-stat-total">0</div>
+          <div style="font-size:10px;color:#7A7568;text-transform:uppercase;letter-spacing:.08em;font-family:monospace;">Total</div>
+        </div>
+        <div style="background:#F5F0E8;border:1px solid rgba(44,74,46,.18);border-radius:8px;padding:10px;text-align:center;border-top:3px solid #C4922A;">
+          <div style="font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;color:#1A1A18;" id="tablet-maint-stat-month">0</div>
+          <div style="font-size:10px;color:#7A7568;text-transform:uppercase;letter-spacing:.08em;font-family:monospace;">This Month</div>
+        </div>
+        <div style="background:#F5F0E8;border:1px solid rgba(44,74,46,.18);border-radius:8px;padding:10px;text-align:center;border-top:3px solid #7A7568;">
+          <div style="font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;color:#1A1A18;" id="tablet-maint-stat-days">-</div>
+          <div style="font-size:10px;color:#7A7568;text-transform:uppercase;letter-spacing:.08em;font-family:monospace;">Days Since</div>
+        </div>
+      </div>
+      <div style="background:#F5F0E8;border:1px solid rgba(44,74,46,.18);border-radius:10px;padding:14px;margin-bottom:14px;">
+        <div style="font-family:'Playfair Display',Georgia,serif;font-size:14px;font-weight:600;color:#2C4A2E;margin-bottom:12px;">Log Maintenance</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+          <div><label style="display:block;font-size:10px;color:#7A7568;text-transform:uppercase;letter-spacing:.09em;font-family:monospace;margin-bottom:4px;">Date</label><input type="date" id="tablet-maint-date" style="width:100%;padding:10px;border:1px solid rgba(44,74,46,.3);border-radius:8px;background:#fff;font-size:14px;color:#2E2E2C;outline:none;"></div>
+          <div><label style="display:block;font-size:10px;color:#7A7568;text-transform:uppercase;letter-spacing:.09em;font-family:monospace;margin-bottom:4px;">Technician</label><input type="text" id="tablet-maint-tech" placeholder="Your name" style="width:100%;padding:10px;border:1px solid rgba(44,74,46,.3);border-radius:8px;background:#fff;font-size:14px;color:#2E2E2C;outline:none;"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+          <div><label style="display:block;font-size:10px;color:#7A7568;text-transform:uppercase;letter-spacing:.09em;font-family:monospace;margin-bottom:4px;">Type</label>
+            <select id="tablet-maint-type" style="width:100%;padding:10px;border:1px solid rgba(44,74,46,.3);border-radius:8px;background:#fff;font-size:14px;color:#2E2E2C;outline:none;">
+              <option value="routine">Routine Maintenance</option>
+              <option value="repair">Repair</option>
+              <option value="inspection">Inspection</option>
+              <option value="cleaning">Cleaning</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div><label style="display:block;font-size:10px;color:#7A7568;text-transform:uppercase;letter-spacing:.09em;font-family:monospace;margin-bottom:4px;">Parts (optional)</label><input type="text" id="tablet-maint-parts" placeholder="e.g. Filter, O-ring" style="width:100%;padding:10px;border:1px solid rgba(44,74,46,.3);border-radius:8px;background:#fff;font-size:14px;color:#2E2E2C;outline:none;"></div>
+        </div>
+        <div style="margin-bottom:12px;"><label style="display:block;font-size:10px;color:#7A7568;text-transform:uppercase;letter-spacing:.09em;font-family:monospace;margin-bottom:4px;">Work Performed *</label>
+          <textarea id="tablet-maint-work" rows="3" placeholder="Describe the work done..." style="width:100%;padding:10px;border:1px solid rgba(44,74,46,.3);border-radius:8px;background:#fff;font-size:14px;color:#2E2E2C;outline:none;resize:vertical;font-family:Georgia,serif;"></textarea>
+        </div>
+        <button onclick="tabletMaintAddEntry()" style="width:100%;padding:14px;background:#C4922A;color:#1A1A18;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;">Save Entry</button>
+      </div>
+      <div style="background:#F5F0E8;border:1px solid rgba(44,74,46,.18);border-radius:10px;overflow:hidden;">
+        <div style="background:#2C4A2E;padding:10px 14px;"><div style="font-family:'Playfair Display',Georgia,serif;color:#F5F0E8;font-size:14px;font-weight:600;">History</div></div>
+        <div style="padding:10px 14px;border-bottom:1px solid rgba(44,74,46,.15);"><input type="text" id="tablet-maint-search" oninput="tabletMaintRenderEntries()" placeholder="Search entries..." style="width:100%;padding:8px 10px;border:1px solid rgba(44,74,46,.25);border-radius:6px;background:#fff;font-size:13px;color:#2E2E2C;outline:none;"></div>
+        <div id="tablet-maint-entries-list" style="max-height:320px;overflow-y:auto;"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -1793,7 +1858,7 @@ function openPrintSheet(items, qrDataURLs){
 }
 
 function showInvSection(section){
-  ['list','scan','add'].forEach(function(s){
+  ['list','scan','add','maint'].forEach(function(s){
     var el=document.getElementById('inv-section-'+s);
     if(el) el.style.display=s===section?'block':'none';
     var tab=document.getElementById('inv-panel-tab-'+s);
@@ -2372,6 +2437,15 @@ function maintSbFetch(path, opts) {
   });
 }
 
+function maintRefreshAllViews() {
+  // Desktop views
+  maintRenderHome();
+  if (maintCurrentMachineId) { maintRenderStats(); maintRenderEntries(); }
+  // Tablet views
+  tabletMaintRenderMachines();
+  if (maintCurrentMachineId) { tabletMaintRenderStats(); tabletMaintRenderEntries(); }
+}
+
 function maintSync() {
   return Promise.all([
     maintSbFetch('maint_machines?order=created_at.asc'),
@@ -2380,8 +2454,7 @@ function maintSync() {
     maintMachines = res[0];
     maintEntries  = res[1];
     maintSaveLocal();
-    maintRenderHome();
-    if (maintCurrentMachineId) { maintRenderStats(); maintRenderEntries(); }
+    maintRefreshAllViews();
   }).catch(function() {});
 }
 
@@ -2533,9 +2606,7 @@ function maintAddEntry() {
   var entry = { id: maintGenId(), machine_id: maintCurrentMachineId, date: date, tech: tech, type: type, work: work, parts: parts, created_at: new Date().toISOString() };
   maintEntries.unshift(entry);
   maintSaveLocal();
-  maintRenderStats();
-  maintRenderEntries();
-  maintRenderHome();
+  maintRefreshAllViews();
   document.getElementById('maint-entry-work').value  = '';
   document.getElementById('maint-entry-parts').value = '';
   maintPushEntry(entry);
@@ -2545,9 +2616,7 @@ function maintDeleteEntry(id) {
   if (!confirm('Delete this log entry?')) return;
   maintEntries = maintEntries.filter(function(e) { return e.id !== id; });
   maintSaveLocal();
-  maintRenderStats();
-  maintRenderEntries();
-  maintRenderHome();
+  maintRefreshAllViews();
   maintDeleteEntryCloud(id);
 }
 
@@ -2589,7 +2658,7 @@ function maintSaveMachine() {
   }
   maintSaveLocal();
   closeModal('maint-machine-modal');
-  maintRenderHome();
+  maintRefreshAllViews();
 }
 
 function maintDeleteMachine(id) {
@@ -2598,7 +2667,7 @@ function maintDeleteMachine(id) {
   maintMachines = maintMachines.filter(function(x) { return x.id !== id; });
   maintEntries  = maintEntries.filter(function(e) { return e.machine_id !== id; });
   maintSaveLocal();
-  maintRenderHome();
+  maintRefreshAllViews();
   maintDeleteMachineCloud(id);
 }
 
@@ -2709,9 +2778,119 @@ function maintInit() {
   maintRenderHome();
   maintCheckDeepLink();
   maintSync().then(function() {
-    setInterval(maintSync, 10000);
+    setInterval(maintSync, 5000);
   });
 }
+
+
+// ── Tablet maintenance helpers ──────────────────────────────────────
+
+function tabletMaintShowHome() {
+  document.getElementById('tablet-maint-home').style.display = '';
+  document.getElementById('tablet-maint-log-view').style.display = 'none';
+  tabletMaintRenderMachines();
+}
+
+function tabletMaintShowLog(machineId) {
+  var m = maintMachines.find(function(x) { return x.id === machineId; });
+  if (!m) return;
+  maintCurrentMachineId = machineId;
+  document.getElementById('tablet-maint-machine-name').textContent = m.name;
+  document.getElementById('tablet-maint-home').style.display = 'none';
+  document.getElementById('tablet-maint-log-view').style.display = '';
+  document.getElementById('tablet-maint-date').value = new Date().toISOString().slice(0, 10);
+  var t = localStorage.getItem('occ_maint_tech');
+  if (t) document.getElementById('tablet-maint-tech').value = t;
+  tabletMaintRenderStats();
+  tabletMaintRenderEntries();
+}
+
+function tabletMaintRenderMachines() {
+  var grid = document.getElementById('tablet-maint-machines-grid');
+  if (!grid) return;
+  if (!maintMachines.length) {
+    grid.innerHTML = '<div style="text-align:center;padding:28px;color:#7A7568;font-size:13px;">No machines yet. Tap Add Machine to get started.</div>';
+    return;
+  }
+  grid.innerHTML = maintMachines.map(function(m) {
+    var entries = maintEntries.filter(function(e) { return e.machine_id === m.id; });
+    var last = entries[0];
+    var lastStr = last ? (last.date + (last.tech ? ' - ' + last.tech : '') + ': ' + (last.work || '').slice(0, 60) + ((last.work || '').length > 60 ? '...' : '')) : 'No entries yet';
+    return '<div onclick="tabletMaintShowLog(\'' + m.id + '\')" style="background:#F5F0E8;border:1px solid rgba(44,74,46,.2);border-radius:10px;overflow:hidden;cursor:pointer;">'
+      + '<div style="background:#2C4A2E;height:3px;"></div>'
+      + '<div style="padding:12px 14px;">'
+      + '<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:14px;font-weight:600;color:#2C4A2E;margin-bottom:3px;">' + mEsc(m.name) + '</div>'
+      + '<div style="font-size:11px;color:#7A7568;font-family:monospace;margin-bottom:8px;">' + mEsc(m.location || '') + (m.model ? ' - ' + mEsc(m.model) : '') + '</div>'
+      + '<div style="font-size:12px;color:#6B6B5A;padding:6px 8px;background:#EDE5D0;border-radius:5px;border-left:3px solid #C4922A;">' + mEsc(lastStr) + '</div>'
+      + '</div></div>';
+  }).join('');
+}
+
+function tabletMaintRenderStats() {
+  var entries = maintEntries.filter(function(e) { return e.machine_id === maintCurrentMachineId; });
+  var now = new Date();
+  var monthStr = now.toISOString().slice(0, 7);
+  var thisMonth = entries.filter(function(e) { return e.date && e.date.slice(0, 7) === monthStr; }).length;
+  var daysSince = '-';
+  if (entries.length > 0) {
+    var diff = Math.floor((now - new Date(entries[0].date)) / 86400000);
+    daysSince = diff === 0 ? 'Today' : diff + 'd';
+  }
+  var el;
+  el = document.getElementById('tablet-maint-stat-total');  if (el) el.textContent = entries.length;
+  el = document.getElementById('tablet-maint-stat-month');  if (el) el.textContent = thisMonth;
+  el = document.getElementById('tablet-maint-stat-days');   if (el) el.textContent = daysSince;
+}
+
+function tabletMaintRenderEntries() {
+  var entries = maintEntries.filter(function(e) { return e.machine_id === maintCurrentMachineId; });
+  var search = (document.getElementById('tablet-maint-search').value || '').toLowerCase();
+  if (search) entries = entries.filter(function(e) {
+    return ((e.work || '') + (e.tech || '') + (e.parts || '')).toLowerCase().indexOf(search) >= 0;
+  });
+  var list = document.getElementById('tablet-maint-entries-list');
+  if (!list) return;
+  if (!entries.length) {
+    list.innerHTML = '<div style="text-align:center;padding:24px;color:#7A7568;font-size:13px;">No entries yet.</div>';
+    return;
+  }
+  var badgeColors = { routine:'#2C6B2F', repair:'#8C5A0A', inspection:'#3949AB', cleaning:'#880E4F', other:'#7A7568' };
+  var badgeBgs    = { routine:'#E4F0E4', repair:'#FDF0D5', inspection:'#E8EAF6', cleaning:'#FCE4EC', other:'#F5F0E8' };
+  list.innerHTML = entries.map(function(e) {
+    var bg  = badgeBgs[e.type]    || badgeBgs.other;
+    var clr = badgeColors[e.type] || badgeColors.other;
+    return '<div style="padding:12px 14px;border-bottom:1px solid rgba(44,74,46,.12);">'
+      + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap;">'
+      + '<span style="background:#2C4A2E;color:#F5F0E8;font-size:11px;font-family:monospace;padding:2px 7px;border-radius:4px;">' + mEsc(e.date) + '</span>'
+      + (e.tech ? '<span style="font-size:11px;color:#7A7568;font-style:italic;">by ' + mEsc(e.tech) + '</span>' : '')
+      + '<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.05em;background:' + bg + ';color:' + clr + ';border:1px solid ' + clr + ';">' + mEsc(e.type || 'other') + '</span>'
+      + '</div>'
+      + '<div style="font-size:13px;color:#2E2E2C;line-height:1.5;">' + mEsc(e.work || '') + '</div>'
+      + (e.parts ? '<div style="font-size:11px;color:#7A7568;margin-top:4px;font-family:monospace;">Parts: ' + mEsc(e.parts) + '</div>' : '')
+      + '</div>';
+  }).join('');
+}
+
+function tabletMaintAddEntry() {
+  var work = document.getElementById('tablet-maint-work').value.trim();
+  if (!work) { alert('Please describe the work performed.'); return; }
+  var date  = document.getElementById('tablet-maint-date').value || new Date().toISOString().slice(0, 10);
+  var tech  = document.getElementById('tablet-maint-tech').value.trim();
+  var type  = document.getElementById('tablet-maint-type').value;
+  var parts = document.getElementById('tablet-maint-parts').value.trim();
+  if (tech) localStorage.setItem('occ_maint_tech', tech);
+  var entry = { id: maintGenId(), machine_id: maintCurrentMachineId, date: date, tech: tech, type: type, work: work, parts: parts, created_at: new Date().toISOString() };
+  maintEntries.unshift(entry);
+  maintSaveLocal();
+  maintRefreshAllViews();
+  document.getElementById('tablet-maint-work').value  = '';
+  document.getElementById('tablet-maint-parts').value = '';
+  maintPushEntry(entry);
+}
+
+// Hook into maintSync to also refresh tablet view
+// (tablet sync handled by maintRefreshAllViews)
+
 
 maintInit();
 
