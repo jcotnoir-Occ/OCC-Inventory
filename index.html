@@ -708,6 +708,7 @@
           <button onclick="maintShowAddMachineModal()" style="padding:8px 12px;background:#C4922A;color:#1A1A18;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;"><i class="ti ti-plus"></i> Add Machine</button>
         </div>
       </div>
+      <div id="tablet-maint-status" style="display:none;padding:10px 12px;border-radius:8px;font-size:12px;font-family:monospace;margin-bottom:10px;"></div>
       <div id="tablet-maint-machines-grid" style="display:flex;flex-direction:column;gap:10px;"></div>
     </div>
 
@@ -1885,6 +1886,7 @@ function showInvSection(section){
   }
   if(section==='maint'){
     tabletMaintRenderMachines();
+    maintSync();
   }
 }
 
@@ -2449,6 +2451,17 @@ function maintRefreshAllViews() {
   if (maintCurrentMachineId) { tabletMaintRenderStats(); tabletMaintRenderEntries(); }
 }
 
+function maintSetStatus(msg, isError) {
+  var el = document.getElementById('tablet-maint-status');
+  if (!el) return;
+  if (!msg) { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  el.style.background = isError ? '#FAEAEA' : '#E4F0E4';
+  el.style.color = isError ? '#8B2020' : '#2C6B2F';
+  el.style.border = isError ? '1px solid #D47070' : '1px solid #8FC48F';
+  el.textContent = msg;
+}
+
 function maintSync() {
   return Promise.all([
     maintSbFetch('maint_machines?order=created_at.asc'),
@@ -2457,8 +2470,16 @@ function maintSync() {
     maintMachines = res[0];
     maintEntries  = res[1];
     maintSaveLocal();
+    maintSetStatus('');
     maintRefreshAllViews();
-  }).catch(function() {});
+  }).catch(function(err) {
+    var msg = err && err.message ? err.message : String(err);
+    if (msg.indexOf('does not exist') >= 0 || msg.indexOf('42P01') >= 0) {
+      maintSetStatus('Supabase tables not set up yet. Run the SQL setup in your Supabase dashboard.', true);
+    } else {
+      maintSetStatus('Sync error: ' + msg.slice(0, 120), true);
+    }
+  });
 }
 
 function maintPushMachine(m) {
