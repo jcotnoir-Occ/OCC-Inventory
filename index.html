@@ -255,71 +255,6 @@
     </div>
   </div>
 
-
-  <!-- MAINTENANCE -->
-  <div class="page" id="page-maintenance">
-    <div id="maint-home">
-      <div class="section-header">
-        <div class="section-title">Machines</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn btn-primary" onclick="maintOpenScanner()"><i class="ti ti-scan" style="font-size:13px;"></i> Scan QR</button>
-          <button class="btn btn-primary" onclick="maintShowAddMachineModal()"><i class="ti ti-plus" style="font-size:13px;"></i> Add Machine</button>
-        </div>
-      </div>
-      <div id="maint-machines-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;"></div>
-    </div>
-    <div id="maint-log-view" style="display:none;">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap;">
-        <button onclick="maintShowHome()" style="background:var(--forest-pale);border:1px solid var(--border-strong);border-radius:6px;padding:6px 14px;font-size:13px;cursor:pointer;color:var(--forest);font-family:'Source Serif 4',serif;display:flex;align-items:center;gap:5px;"><i class="ti ti-arrow-left" style="font-size:13px;"></i> All Machines</button>
-        <div class="section-title" id="maint-log-machine-name" style="flex:1;"></div>
-        <button onclick="maintShowQr(maintCurrentMachineId)" class="btn" style="background:transparent;border:1px solid var(--border-strong);color:var(--forest);"><i class="ti ti-qrcode" style="font-size:13px;"></i> QR Code</button>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
-        <div class="metric-card green"><div class="metric-label">Total Entries</div><div class="metric-value" id="maint-stat-total">0</div></div>
-        <div class="metric-card amber"><div class="metric-label">This Month</div><div class="metric-value" id="maint-stat-month">0</div></div>
-        <div class="metric-card" style="border-top:3px solid var(--stone);"><div class="metric-label">Days Since Log</div><div class="metric-value" id="maint-stat-days">—</div></div>
-      </div>
-      <div class="panel" style="margin-bottom:18px;">
-        <div class="panel-header"><div class="panel-title"><i class="ti ti-pencil"></i> Log Maintenance</div></div>
-        <div style="padding:16px 18px;">
-          <div class="form-row-2">
-            <div><label class="form-label">Date</label><input class="form-input" type="date" id="maint-entry-date"></div>
-            <div><label class="form-label">Technician</label><input class="form-input" type="text" id="maint-entry-tech" placeholder="Your name"></div>
-          </div>
-          <div class="form-row-2">
-            <div><label class="form-label">Type</label>
-              <select class="form-input" id="maint-entry-type">
-                <option value="routine">Routine Maintenance</option>
-                <option value="repair">Repair</option>
-                <option value="inspection">Inspection</option>
-                <option value="cleaning">Cleaning</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-            <div><label class="form-label">Parts / Materials (optional)</label><input class="form-input" type="text" id="maint-entry-parts" placeholder="e.g. Filter, O-ring"></div>
-          </div>
-          <div class="form-row"><label class="form-label">Work Performed *</label><textarea class="form-input" id="maint-entry-work" rows="3" placeholder="Describe the maintenance work done..." style="resize:vertical;"></textarea></div>
-          <button class="btn-save" onclick="maintAddEntry()" style="width:100%;padding:10px;font-size:14px;">Save Entry</button>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="panel-header"><div class="panel-title"><i class="ti ti-history"></i> History</div></div>
-        <div style="padding:10px 14px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;background:var(--parchment);">
-          <input class="search-input" type="text" id="maint-filter-search" placeholder="Search entries..." oninput="maintRenderEntries()" style="flex:1;min-width:140px;">
-          <select class="filter-select" id="maint-filter-type" onchange="maintRenderEntries()">
-            <option value="">All Types</option>
-            <option value="routine">Routine</option>
-            <option value="repair">Repair</option>
-            <option value="inspection">Inspection</option>
-            <option value="cleaning">Cleaning</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-        <div id="maint-entries-list" style="padding:4px 0;"></div>
-      </div>
-    </div>
-  </div>
-
   <!-- INVENTORY -->
   <div class="page" id="page-inventory">
     <div class="section-header">
@@ -369,6 +304,71 @@
     </div>
   </div>
 
+
+
+  <!-- MAINTENANCE PAGE -->
+  <div class="page" id="page-maintenance">
+    <div id="maint-home">
+      <div class="section-header">
+        <div class="section-title">Machines</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="maintOpenScanner()"><i class="ti ti-scan" style="font-size:13px;"></i> Scan QR</button>
+          <button class="btn btn-primary" onclick="maintShowAddMachineModal()"><i class="ti ti-plus" style="font-size:13px;"></i> Add Machine</button>
+        </div>
+      </div>
+      <div id="maint-machines-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;"></div>
+    </div>
+    <div id="maint-log-view" style="display:none;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap;">
+        <button onclick="maintShowHome()" style="background:var(--forest-pale);border:1px solid var(--border-strong);border-radius:6px;padding:6px 14px;font-size:13px;cursor:pointer;color:var(--forest);font-family:'Source Serif 4',serif;display:flex;align-items:center;gap:5px;"><i class="ti ti-arrow-left" style="font-size:13px;"></i> All Machines</button>
+        <div class="section-title" id="maint-log-machine-name" style="flex:1;"></div>
+        <button onclick="maintShowQr(maintCurrentMachineId)" class="btn" style="background:transparent;border:1px solid var(--border-strong);color:var(--forest);"><i class="ti ti-qrcode" style="font-size:13px;"></i> QR Code</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+        <div class="metric-card green"><div class="metric-label">Total Entries</div><div class="metric-value" id="maint-stat-total">0</div></div>
+        <div class="metric-card amber"><div class="metric-label">This Month</div><div class="metric-value" id="maint-stat-month">0</div></div>
+        <div class="metric-card" style="border-top:3px solid var(--stone);"><div class="metric-label">Days Since Log</div><div class="metric-value" id="maint-stat-days">-</div></div>
+      </div>
+      <div class="panel" style="margin-bottom:18px;">
+        <div class="panel-header"><div class="panel-title"><i class="ti ti-pencil"></i> Log Maintenance</div></div>
+        <div style="padding:16px 18px;">
+          <div class="form-row-2">
+            <div><label class="form-label">Date</label><input class="form-input" type="date" id="maint-entry-date"></div>
+            <div><label class="form-label">Technician</label><input class="form-input" type="text" id="maint-entry-tech" placeholder="Your name"></div>
+          </div>
+          <div class="form-row-2">
+            <div><label class="form-label">Type</label>
+              <select class="form-input" id="maint-entry-type">
+                <option value="routine">Routine Maintenance</option>
+                <option value="repair">Repair</option>
+                <option value="inspection">Inspection</option>
+                <option value="cleaning">Cleaning</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div><label class="form-label">Parts / Materials (optional)</label><input class="form-input" type="text" id="maint-entry-parts" placeholder="e.g. Filter, O-ring"></div>
+          </div>
+          <div class="form-row"><label class="form-label">Work Performed *</label><textarea class="form-input" id="maint-entry-work" rows="3" placeholder="Describe the work done..." style="resize:vertical;"></textarea></div>
+          <button class="btn-save" onclick="maintAddEntry()" style="width:100%;padding:10px;font-size:14px;">Save Entry</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title"><i class="ti ti-history"></i> History</div></div>
+        <div style="padding:10px 14px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;background:var(--parchment);">
+          <input class="search-input" type="text" id="maint-filter-search" placeholder="Search entries..." oninput="maintRenderEntries()" style="flex:1;min-width:140px;">
+          <select class="filter-select" id="maint-filter-type" onchange="maintRenderEntries()">
+            <option value="">All Types</option>
+            <option value="routine">Routine</option>
+            <option value="repair">Repair</option>
+            <option value="inspection">Inspection</option>
+            <option value="cleaning">Cleaning</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div id="maint-entries-list" style="padding:4px 0;"></div>
+      </div>
+    </div>
+  </div>
 
 </main>
 </div>
@@ -696,6 +696,62 @@
     </div>
   </div>
 </div>
+
+<!-- MAINTENANCE: ADD MACHINE MODAL -->
+<div class="modal-overlay" id="maint-machine-modal">
+  <div class="modal">
+    <div class="modal-header"><h3 id="maint-machine-modal-title">Add Machine</h3><button class="modal-close" onclick="closeModal('maint-machine-modal')">x</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label class="form-label">Machine Name *</label><input class="form-input" type="text" id="maint-machine-name" placeholder="e.g. Pasteurizer #1" onkeydown="if(event.key==='Enter')maintSaveMachine()"></div>
+      <div class="form-row"><label class="form-label">Location / Area</label><input class="form-input" type="text" id="maint-machine-location" placeholder="e.g. Processing Floor"></div>
+      <div class="form-row"><label class="form-label">Model / Serial (optional)</label><input class="form-input" type="text" id="maint-machine-model" placeholder="e.g. Model XJ-500"></div>
+      <input type="hidden" id="maint-machine-edit-id">
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('maint-machine-modal')">Cancel</button>
+      <button class="btn-save" onclick="maintSaveMachine()">Save Machine</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAINTENANCE: QR MODAL -->
+<div class="modal-overlay" id="maint-qr-modal">
+  <div class="modal">
+    <div class="modal-header"><h3>Machine QR Code</h3><button class="modal-close" onclick="closeModal('maint-qr-modal')">x</button></div>
+    <div class="modal-body" style="text-align:center;">
+      <div id="maint-qr-container" style="display:flex;justify-content:center;margin:10px 0;"></div>
+      <div id="maint-qr-url-label" style="font-size:11px;color:var(--stone);word-break:break-all;margin:10px 0;font-family:'DM Mono',monospace;"></div>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button class="btn-save" style="flex:1;" onclick="maintPrintQr()"><i class="ti ti-printer" style="font-size:13px;"></i> Print Label</button>
+        <button class="btn-cancel" style="flex:1;" onclick="closeModal('maint-qr-modal')">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAINTENANCE: SCANNER OVERLAY -->
+<div id="maint-scanner-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:#F9F5EE;overflow-y:auto;">
+  <div style="background:#2C4A2E;border-bottom:3px solid #C4922A;padding:16px 20px;text-align:center;position:sticky;top:0;">
+    <div style="font-family:'Playfair Display',Georgia,serif;color:#F5F0E8;font-size:18px;font-weight:600;">Scan Machine QR Code</div>
+    <div style="color:#E8B84B;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-family:'DM Mono',monospace;margin-top:3px;">Old Chatham Creamery - Maintenance</div>
+  </div>
+  <div style="padding:16px;max-width:480px;margin:0 auto;">
+    <div style="background:#000;border-radius:12px;overflow:hidden;position:relative;aspect-ratio:1;width:100%;margin-bottom:14px;">
+      <video id="maint-scanner-video" style="width:100%;height:100%;object-fit:cover;display:block;" autoplay muted playsinline></video>
+      <canvas id="maint-scanner-canvas" style="display:none;"></canvas>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
+        <div style="width:60%;height:60%;border:3px solid #C4922A;border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,0.5);"></div>
+      </div>
+      <div id="maint-scanner-status" style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);color:#F5F0E8;text-align:center;padding:10px;font-size:12px;font-family:monospace;">Press Start Camera to begin.</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <button onclick="maintStartCamera()" id="maint-scan-start-btn" style="flex:1;padding:12px;background:#2C4A2E;color:#F5F0E8;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">Start Camera</button>
+      <button onclick="maintStopCamera()" id="maint-scan-stop-btn" style="flex:1;padding:12px;background:#7A7568;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;display:none;">Stop</button>
+    </div>
+    <button onclick="maintCloseScanner()" style="width:100%;padding:12px;background:#B84040;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">Cancel</button>
+  </div>
+</div>
+
 
 
 <script>
@@ -1060,63 +1116,7 @@ function printQR(){
       +'setTimeout(tryPrint,150);'
     +'};'
     +'<\/script>'
-    +'
-<!-- ── MAINTENANCE: ADD MACHINE MODAL ──────────────────────────── -->
-<div class="modal-overlay" id="maint-machine-modal">
-  <div class="modal">
-    <div class="modal-header"><h3 id="maint-machine-modal-title">Add Machine</h3><button class="modal-close" onclick="closeModal('maint-machine-modal')">×</button></div>
-    <div class="modal-body">
-      <div class="form-row"><label class="form-label">Machine Name *</label><input class="form-input" type="text" id="maint-machine-name" placeholder="e.g. Pasteurizer #1" onkeydown="if(event.key==='Enter')maintSaveMachine()"></div>
-      <div class="form-row"><label class="form-label">Location / Area</label><input class="form-input" type="text" id="maint-machine-location" placeholder="e.g. Processing Floor"></div>
-      <div class="form-row"><label class="form-label">Model / Serial (optional)</label><input class="form-input" type="text" id="maint-machine-model" placeholder="e.g. Model XJ-500"></div>
-      <input type="hidden" id="maint-machine-edit-id">
-    </div>
-    <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeModal('maint-machine-modal')">Cancel</button>
-      <button class="btn-save" onclick="maintSaveMachine()">Save Machine</button>
-    </div>
-  </div>
-</div>
-
-<!-- ── MAINTENANCE: QR MODAL ──────────────────────────────────── -->
-<div class="modal-overlay" id="maint-qr-modal">
-  <div class="modal">
-    <div class="modal-header"><h3>Machine QR Code</h3><button class="modal-close" onclick="closeModal('maint-qr-modal')">×</button></div>
-    <div class="modal-body" style="text-align:center;">
-      <div id="maint-qr-container" style="display:flex;justify-content:center;margin:10px 0;"></div>
-      <div id="maint-qr-url-label" style="font-size:11px;color:var(--stone);word-break:break-all;margin:10px 0;font-family:'DM Mono',monospace;"></div>
-      <div style="display:flex;gap:8px;margin-top:14px;">
-        <button class="btn-save" style="flex:1;" onclick="maintPrintQr()"><i class="ti ti-printer" style="font-size:13px;"></i> Print Label</button>
-        <button class="btn-cancel" style="flex:1;" onclick="closeModal('maint-qr-modal')">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ── MAINTENANCE: SCANNER OVERLAY ───────────────────────────── -->
-<div id="maint-scanner-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:#F9F5EE;overflow-y:auto;font-family:Georgia,serif;">
-  <div style="background:#2C4A2E;border-bottom:3px solid #C4922A;padding:16px 20px;text-align:center;position:sticky;top:0;">
-    <div style="font-family:'Playfair Display',Georgia,serif;color:#F5F0E8;font-size:18px;font-weight:600;">Scan Machine QR Code</div>
-    <div style="color:#E8B84B;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-family:'DM Mono',monospace;margin-top:3px;">Old Chatham Creamery — Maintenance</div>
-  </div>
-  <div style="padding:16px;max-width:480px;margin:0 auto;">
-    <div style="background:#000;border-radius:12px;overflow:hidden;position:relative;aspect-ratio:1;width:100%;margin-bottom:14px;">
-      <video id="maint-scanner-video" style="width:100%;height:100%;object-fit:cover;display:block;" autoplay muted playsinline></video>
-      <canvas id="maint-scanner-canvas" style="display:none;"></canvas>
-      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
-        <div style="width:60%;height:60%;border:3px solid #C4922A;border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,0.5);"></div>
-      </div>
-      <div id="maint-scanner-status" style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);color:#F5F0E8;text-align:center;padding:10px;font-size:12px;font-family:monospace;">Press Start Camera to begin.</div>
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:14px;">
-      <button onclick="maintStartCamera()" id="maint-scan-start-btn" style="flex:1;padding:12px;background:#2C4A2E;color:#F5F0E8;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;"><i class="ti ti-camera"></i> Start Camera</button>
-      <button onclick="maintStopCamera()" id="maint-scan-stop-btn" style="flex:1;padding:12px;background:#7A7568;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;display:none;"><i class="ti ti-camera-off"></i> Stop</button>
-    </div>
-    <button onclick="maintCloseScanner()" style="width:100%;padding:12px;background:#B84040;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">Cancel</button>
-  </div>
-</div>
-
-</body></html>';
+    +'</body></html>';
 
   var w=window.open('','_blank');
   w.document.open();
@@ -2323,25 +2323,26 @@ if(window.location.search.indexOf('inventory')!==-1){
 }
 
 
-// ════════════════════════════════════════════════════════════════════
+// ================================================================
 // MAINTENANCE MODULE
-// ════════════════════════════════════════════════════════════════════
-var MAINT_BASE_URL = 'https://jcotnoir-occ.github.io/OCC-Inventory/';
-var MAINT_SB_URL   = 'https://otlkjzaaogczcrszcogm.supabase.co';
-var MAINT_SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90bGtqemFhb2djenJzemNvZ20iLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0NzI1NjQ3NCwiZXhwIjoyMDYyODMyNDc0fQ.3C_HmxMbqajjTHVUoJB6Ej95rqVmqNi5s4JbLAqFKVA';
+// ================================================================
+var MAINT_SB_URL = 'https://otlkjzaaogczcrszcogm.supabase.co';
+var MAINT_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90bGtqemFhb2djenJzemNvZ20iLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0NzI1NjQ3NCwiZXhwIjoyMDYyODMyNDc0fQ.3C_HmxMbqajjTHVUoJB6Ej95rqVmqNi5s4JbLAqFKVA';
+var MAINT_BASE   = 'https://jcotnoir-occ.github.io/OCC-Inventory/';
 
-var maintMachines       = [];
-var maintEntries        = [];
+var maintMachines = [];
+var maintEntries  = [];
 var maintCurrentMachineId = null;
-var maintScanStream     = null;
-var maintScanTimer      = null;
-var maintPollTimer      = null;
+var maintScanStream = null;
+var maintScanTimer  = null;
 
-// ── Local storage ──
 function maintSaveLocal() {
-  localStorage.setItem('occ_maint_machines', JSON.stringify(maintMachines));
-  localStorage.setItem('occ_maint_entries',  JSON.stringify(maintEntries));
+  try {
+    localStorage.setItem('occ_maint_machines', JSON.stringify(maintMachines));
+    localStorage.setItem('occ_maint_entries',  JSON.stringify(maintEntries));
+  } catch(e) {}
 }
+
 function maintLoadLocal() {
   try {
     maintMachines = JSON.parse(localStorage.getItem('occ_maint_machines') || '[]');
@@ -2349,24 +2350,29 @@ function maintLoadLocal() {
   } catch(e) { maintMachines = []; maintEntries = []; }
 }
 
-// ── Supabase helpers ──
 function maintSbFetch(path, opts) {
   opts = opts || {};
-  return fetch(MAINT_SB_URL + '/rest/v1/' + path, Object.assign({}, opts, {
-    headers: Object.assign({
-      'apikey': MAINT_SB_KEY,
-      'Authorization': 'Bearer ' + MAINT_SB_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=representation'
-    }, opts.headers || {})
-  })).then(function(r) {
+  var headers = {
+    'apikey': MAINT_SB_KEY,
+    'Authorization': 'Bearer ' + MAINT_SB_KEY,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=representation'
+  };
+  if (opts.headers) {
+    Object.keys(opts.headers).forEach(function(k) { headers[k] = opts.headers[k]; });
+  }
+  return fetch(MAINT_SB_URL + '/rest/v1/' + path, {
+    method: opts.method || 'GET',
+    headers: headers,
+    body: opts.body || undefined
+  }).then(function(r) {
     if (!r.ok) return r.text().then(function(t) { throw new Error(t); });
     if (r.status === 204) return [];
     return r.json();
   });
 }
 
-function maintSyncFromCloud() {
+function maintSync() {
   return Promise.all([
     maintSbFetch('maint_machines?order=created_at.asc'),
     maintSbFetch('maint_entries?order=date.desc,created_at.desc')
@@ -2381,7 +2387,8 @@ function maintSyncFromCloud() {
 
 function maintPushMachine(m) {
   return maintSbFetch('maint_machines', {
-    method: 'POST', body: JSON.stringify(m),
+    method: 'POST',
+    body: JSON.stringify(m),
     headers: { 'Prefer': 'resolution=merge-duplicates,return=representation' }
   }).catch(function() {});
 }
@@ -2392,7 +2399,8 @@ function maintDeleteMachineCloud(id) {
 
 function maintPushEntry(e) {
   return maintSbFetch('maint_entries', {
-    method: 'POST', body: JSON.stringify(e),
+    method: 'POST',
+    body: JSON.stringify(e),
     headers: { 'Prefer': 'resolution=merge-duplicates,return=representation' }
   }).catch(function() {});
 }
@@ -2401,15 +2409,14 @@ function maintDeleteEntryCloud(id) {
   return maintSbFetch('maint_entries?id=eq.' + id, { method: 'DELETE' }).catch(function() {});
 }
 
-// ── ID gen ──
-function maintGenId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
-
-// ── Escape ──
-function maintEsc(s) {
-  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function maintGenId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
-// ── Views ──
+function mEsc(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
 function maintShowHome() {
   maintCurrentMachineId = null;
   document.getElementById('maint-home').style.display = '';
@@ -2424,16 +2431,14 @@ function maintShowLog(machineId) {
   document.getElementById('maint-log-machine-name').textContent = m.name;
   document.getElementById('maint-home').style.display = 'none';
   document.getElementById('maint-log-view').style.display = '';
-  document.getElementById('maint-entry-date').value = new Date().toISOString().slice(0,10);
-  var savedTech = localStorage.getItem('occ_maint_tech');
-  if (savedTech) document.getElementById('maint-entry-tech').value = savedTech;
+  document.getElementById('maint-entry-date').value = new Date().toISOString().slice(0, 10);
+  var t = localStorage.getItem('occ_maint_tech');
+  if (t) document.getElementById('maint-entry-tech').value = t;
   maintRenderStats();
   maintRenderEntries();
-  // Switch to maintenance tab
   switchTab('maintenance', document.getElementById('tab-maintenance'));
 }
 
-// ── Render machine grid ──
 function maintRenderHome() {
   var grid = document.getElementById('maint-machines-grid');
   if (!grid) return;
@@ -2441,34 +2446,35 @@ function maintRenderHome() {
   maintMachines.forEach(function(m) {
     var entries = maintEntries.filter(function(e) { return e.machine_id === m.id; });
     var last = entries[0];
-    var lastStr = last
-      ? '<strong style="display:block;margin-bottom:2px;">' + last.date + (last.tech ? ' \u2014 ' + maintEsc(last.tech) : '') + '</strong>' + maintEsc((last.work || '').slice(0, 80)) + ((last.work || '').length > 80 ? '\u2026' : '')
+    var lastHtml = last
+      ? '<strong style="display:block;margin-bottom:2px;">' + mEsc(last.date) + (last.tech ? ' - ' + mEsc(last.tech) : '') + '</strong>' + mEsc((last.work || '').slice(0, 80)) + ((last.work || '').length > 80 ? '...' : '')
       : 'No entries yet';
-    html += '<div style="background:var(--cream);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.05);cursor:pointer;transition:box-shadow .15s,transform .1s;" onmouseover="this.style.boxShadow=\'0 4px 16px rgba(44,74,46,.18)\';this.style.transform=\'translateY(-2px)\';" onmouseout="this.style.boxShadow=\'0 2px 6px rgba(0,0,0,.05)\';this.style.transform=\'\';"> '
-      + '<div style="background:var(--forest);height:4px;"></div>'
-      + '<div style="padding:16px;" onclick="maintShowLog(\'' + m.id + '\')">'
-      + '<div style="font-family:\'Playfair Display\',serif;font-size:15px;font-weight:600;color:var(--forest);margin-bottom:4px;">' + maintEsc(m.name) + '</div>'
-      + '<div style="font-size:11px;color:var(--stone);font-family:\'DM Mono\',monospace;margin-bottom:10px;">' + maintEsc(m.location || '') + (m.model ? ' \xb7 ' + maintEsc(m.model) : '') + '</div>'
-      + '<div style="font-size:12px;padding:8px 10px;background:var(--parchment);border-radius:6px;border-left:3px solid var(--gold);color:var(--stone);line-height:1.5;">' + lastStr + '</div>'
-      + '</div>'
-      + '<div style="padding:0 14px 14px;display:flex;gap:6px;" onclick="event.stopPropagation()">'
-      + '<button class="btn btn-sm" style="background:transparent;border:1px solid var(--border-strong);color:var(--forest);" onclick="maintShowQr(\'' + m.id + '\')"><i class="ti ti-qrcode"></i></button>'
-      + '<button class="btn btn-sm" style="background:transparent;border:1px solid var(--border-strong);color:var(--forest);" onclick="maintEditMachine(\'' + m.id + '\')">Edit</button>'
-      + '<button class="btn btn-sm" style="background:#B84040;border-color:#B84040;color:#fff;" onclick="maintDeleteMachine(\'' + m.id + '\')">Delete</button>'
-      + '</div></div>';
+    html += '<div style="background:var(--cream);border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;" onclick="maintShowLog(\'' + m.id + '\')">';
+    html += '<div style="background:var(--forest);height:4px;"></div>';
+    html += '<div style="padding:16px;">';
+    html += '<div style="font-family:\'Playfair Display\',serif;font-size:15px;font-weight:600;color:var(--forest);margin-bottom:4px;">' + mEsc(m.name) + '</div>';
+    html += '<div style="font-size:11px;color:var(--stone);font-family:\'DM Mono\',monospace;margin-bottom:10px;">' + mEsc(m.location || '') + (m.model ? ' - ' + mEsc(m.model) : '') + '</div>';
+    html += '<div style="font-size:12px;padding:8px 10px;background:var(--parchment);border-radius:6px;border-left:3px solid var(--gold);color:var(--stone);line-height:1.5;">' + lastHtml + '</div>';
+    html += '</div>';
+    html += '<div style="padding:0 14px 14px;display:flex;gap:6px;" onclick="event.stopPropagation()">';
+    html += '<button class="btn btn-sm" style="background:transparent;border:1px solid var(--border-strong);color:var(--forest);" onclick="maintShowQr(\'' + m.id + '\')">QR</button>';
+    html += '<button class="btn btn-sm" style="background:transparent;border:1px solid var(--border-strong);color:var(--forest);" onclick="maintEditMachine(\'' + m.id + '\')">Edit</button>';
+    html += '<button class="btn btn-sm" style="background:#B84040;border-color:#B84040;color:#fff;" onclick="maintDeleteMachine(\'' + m.id + '\')">Delete</button>';
+    html += '</div></div>';
   });
-  // Add card
-  html += '<div onclick="maintShowAddMachineModal()" style="background:var(--cream-dark);border:2px dashed var(--gold);border-radius:10px;min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:background .15s;" onmouseover="this.style.background=\'#dfd6be\';" onmouseout="this.style.background=\'var(--cream-dark)\';"><div style="font-size:2rem;color:var(--gold);line-height:1;">+</div><div style="font-size:11px;font-family:\'DM Mono\',monospace;color:var(--stone);text-transform:uppercase;letter-spacing:.08em;">Add Machine</div></div>';
+  html += '<div onclick="maintShowAddMachineModal()" style="background:var(--cream-dark);border:2px dashed var(--gold);border-radius:10px;min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;">';
+  html += '<div style="font-size:2rem;color:var(--gold);">+</div>';
+  html += '<div style="font-size:11px;font-family:\'DM Mono\',monospace;color:var(--stone);text-transform:uppercase;letter-spacing:.08em;">Add Machine</div>';
+  html += '</div>';
   grid.innerHTML = html;
 }
 
-// ── Stats ──
 function maintRenderStats() {
   var entries = maintEntries.filter(function(e) { return e.machine_id === maintCurrentMachineId; });
   var now = new Date();
-  var monthStr = now.toISOString().slice(0,7);
-  var thisMonth = entries.filter(function(e) { return e.date && e.date.startsWith(monthStr); }).length;
-  var daysSince = '\u2014';
+  var monthStr = now.toISOString().slice(0, 7);
+  var thisMonth = entries.filter(function(e) { return e.date && e.date.slice(0, 7) === monthStr; }).length;
+  var daysSince = '-';
   if (entries.length > 0) {
     var diff = Math.floor((now - new Date(entries[0].date)) / 86400000);
     daysSince = diff === 0 ? 'Today' : diff + 'd';
@@ -2478,23 +2484,22 @@ function maintRenderStats() {
   document.getElementById('maint-stat-days').textContent  = daysSince;
 }
 
-// ── Render entries ──
 function maintRenderEntries() {
   var entries = maintEntries.filter(function(e) { return e.machine_id === maintCurrentMachineId; });
   var search = (document.getElementById('maint-filter-search').value || '').toLowerCase();
   var type   = document.getElementById('maint-filter-type').value || '';
   if (search) entries = entries.filter(function(e) {
-    return (e.work||'').toLowerCase().includes(search) || (e.tech||'').toLowerCase().includes(search) || (e.parts||'').toLowerCase().includes(search);
+    return ((e.work || '') + (e.tech || '') + (e.parts || '')).toLowerCase().indexOf(search) >= 0;
   });
   if (type) entries = entries.filter(function(e) { return e.type === type; });
 
   var list = document.getElementById('maint-entries-list');
   if (!entries.length) {
-    list.innerHTML = '<div style="text-align:center;padding:36px 20px;color:var(--stone);"><div style="font-size:2rem;margin-bottom:10px;">&#128295;</div><div style="font-size:13px;">No entries yet. Log your first maintenance above.</div></div>';
+    list.innerHTML = '<div style="text-align:center;padding:36px 20px;color:var(--stone);"><div style="font-size:2rem;margin-bottom:10px;">&#128295;</div><p style="font-size:13px;">No entries yet. Log your first maintenance above.</p></div>';
     return;
   }
 
-  var typeBadges = {
+  var badgeStyles = {
     routine:    'background:#E4F0E4;color:#2C6B2F;border:1px solid #8FC48F;',
     repair:     'background:#FDF0D5;color:#8C5A0A;border:1px solid #D4A847;',
     inspection: 'background:#E8EAF6;color:#3949AB;border:1px solid #9FA8DA;',
@@ -2503,25 +2508,24 @@ function maintRenderEntries() {
   };
 
   list.innerHTML = entries.map(function(e) {
-    var badge = typeBadges[e.type] || typeBadges.other;
+    var badge = badgeStyles[e.type] || badgeStyles.other;
     return '<div style="padding:14px 18px;border-bottom:1px solid var(--border);position:relative;">'
       + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;flex-wrap:wrap;">'
-      + '<span style="background:var(--forest);color:var(--cream);font-size:11px;font-family:\'DM Mono\',monospace;padding:2px 8px;border-radius:4px;">' + maintEsc(e.date) + '</span>'
-      + (e.tech ? '<span style="font-size:12px;color:var(--stone);font-style:italic;">by ' + maintEsc(e.tech) + '</span>' : '')
-      + '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase;' + badge + '">' + maintEsc(e.type || 'other') + '</span>'
+      + '<span style="background:var(--forest);color:var(--cream);font-size:11px;font-family:\'DM Mono\',monospace;padding:2px 8px;border-radius:4px;">' + mEsc(e.date) + '</span>'
+      + (e.tech ? '<span style="font-size:12px;color:var(--stone);font-style:italic;">by ' + mEsc(e.tech) + '</span>' : '')
+      + '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase;' + badge + '">' + mEsc(e.type || 'other') + '</span>'
       + '</div>'
-      + '<div style="font-size:13px;color:var(--charcoal);line-height:1.55;margin-bottom:' + (e.parts ? '6' : '0') + 'px;">' + maintEsc(e.work || '') + '</div>'
-      + (e.parts ? '<div style="font-size:11px;color:var(--stone);background:var(--parchment);padding:4px 9px;border-radius:4px;display:inline-block;font-family:\'DM Mono\',monospace;">\ud83d\udd29 ' + maintEsc(e.parts) + '</div>' : '')
-      + '<button onclick="maintDeleteEntry(\'' + e.id + '\')" style="position:absolute;top:12px;right:14px;background:none;border:none;cursor:pointer;color:#ccc;font-size:13px;transition:color .15s;" onmouseover="this.style.color=\'#B84040\';" onmouseout="this.style.color=\'#ccc\';">\u2715</button>'
+      + '<div style="font-size:13px;color:var(--charcoal);line-height:1.55;margin-bottom:' + (e.parts ? '6' : '0') + 'px;">' + mEsc(e.work || '') + '</div>'
+      + (e.parts ? '<div style="font-size:11px;color:var(--stone);background:var(--parchment);padding:4px 9px;border-radius:4px;display:inline-block;font-family:\'DM Mono\',monospace;">Parts: ' + mEsc(e.parts) + '</div>' : '')
+      + '<button onclick="maintDeleteEntry(\'' + e.id + '\')" style="position:absolute;top:12px;right:14px;background:none;border:none;cursor:pointer;color:#ccc;font-size:13px;" onmouseover="this.style.color=\'#B84040\';" onmouseout="this.style.color=\'#ccc\';">x</button>'
       + '</div>';
   }).join('');
 }
 
-// ── Add entry ──
 function maintAddEntry() {
   var work = document.getElementById('maint-entry-work').value.trim();
   if (!work) { alert('Please describe the work performed.'); return; }
-  var date  = document.getElementById('maint-entry-date').value || new Date().toISOString().slice(0,10);
+  var date  = document.getElementById('maint-entry-date').value || new Date().toISOString().slice(0, 10);
   var tech  = document.getElementById('maint-entry-tech').value.trim();
   var type  = document.getElementById('maint-entry-type').value;
   var parts = document.getElementById('maint-entry-parts').value.trim();
@@ -2537,7 +2541,6 @@ function maintAddEntry() {
   maintPushEntry(entry);
 }
 
-// ── Delete entry ──
 function maintDeleteEntry(id) {
   if (!confirm('Delete this log entry?')) return;
   maintEntries = maintEntries.filter(function(e) { return e.id !== id; });
@@ -2548,7 +2551,6 @@ function maintDeleteEntry(id) {
   maintDeleteEntryCloud(id);
 }
 
-// ── Machines CRUD ──
 function maintShowAddMachineModal() {
   document.getElementById('maint-machine-modal-title').textContent = 'Add Machine';
   document.getElementById('maint-machine-name').value     = '';
@@ -2578,7 +2580,7 @@ function maintSaveMachine() {
   var editId   = document.getElementById('maint-machine-edit-id').value;
   if (editId) {
     var idx = maintMachines.findIndex(function(x) { return x.id === editId; });
-    maintMachines[idx] = Object.assign({}, maintMachines[idx], { name: name, location: location, model: model });
+    if (idx >= 0) { maintMachines[idx].name = name; maintMachines[idx].location = location; maintMachines[idx].model = model; }
     maintPushMachine(maintMachines[idx]);
   } else {
     var m = { id: maintGenId(), name: name, location: location, model: model, created_at: new Date().toISOString() };
@@ -2592,25 +2594,23 @@ function maintSaveMachine() {
 
 function maintDeleteMachine(id) {
   var m = maintMachines.find(function(x) { return x.id === id; });
-  if (!confirm('Delete "' + (m ? m.name : 'machine') + '" and ALL its log entries?')) return;
+  if (!confirm('Delete "' + (m ? m.name : 'this machine') + '" and all its log entries?')) return;
   maintMachines = maintMachines.filter(function(x) { return x.id !== id; });
-  maintEntries  = maintEntries.filter(function(e)  { return e.machine_id !== id; });
+  maintEntries  = maintEntries.filter(function(e) { return e.machine_id !== id; });
   maintSaveLocal();
   maintRenderHome();
   maintDeleteMachineCloud(id);
 }
 
-// ── QR ──
 function maintShowQr(machineId) {
   var m = maintMachines.find(function(x) { return x.id === machineId; });
   if (!m) return;
-  var url = MAINT_BASE_URL + '#maint-' + machineId;
+  var url = MAINT_BASE + '#maint-' + machineId;
   document.getElementById('maint-qr-url-label').textContent = url;
   var container = document.getElementById('maint-qr-container');
   container.innerHTML = '';
   new QRCode(container, { text: url, width: 220, height: 220, correctLevel: QRCode.CorrectLevel.H });
   document.getElementById('maint-qr-modal').dataset.machineName = m.name;
-  document.getElementById('maint-qr-modal').dataset.machineUrl  = url;
   document.getElementById('maint-qr-modal').classList.add('show');
 }
 
@@ -2620,15 +2620,17 @@ function maintPrintQr() {
   var canvas = document.querySelector('#maint-qr-container canvas');
   var dataUrl = canvas ? canvas.toDataURL() : '';
   var win = window.open('', '_blank');
-  win.document.write('<!DOCTYPE html><html><head>'
+  var html = '<!DOCTYPE html><html><head>'
     + '<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">'
-    + '<style>body{margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#fff;}.label{border:3px solid #2C4A2E;border-radius:14px;padding:22px 28px;text-align:center;width:300px;font-family:"Source Sans 3",sans-serif;}.brand{font-family:"Playfair Display",serif;font-size:13px;color:#2C4A2E;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;}.mname{font-family:"Playfair Display",serif;font-size:20px;font-weight:700;color:#1A1A1A;margin:8px 0;}img{width:200px;height:200px;border-radius:8px;display:block;margin:12px auto;}.scan-label{font-size:11px;color:#7A7568;letter-spacing:.08em;text-transform:uppercase;margin-top:6px;}.gold-bar{height:4px;background:#C4922A;border-radius:2px;margin-bottom:10px;}</style>'
-    + '</head><body><div class="label"><div class="gold-bar"></div><div class="brand">Old Chatham Creamery</div><div class="mname">' + name + '</div><img src="' + dataUrl + '"><div class="scan-label">Scan to log maintenance</div></div>'
-    + '<scr'+'ipt>window.onload=function(){window.print();window.close();};<\/scr'+'ipt></body></html>');
+    + '<style>body{margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;}.label{border:3px solid #2C4A2E;border-radius:14px;padding:22px 28px;text-align:center;width:300px;}.brand{font-family:"Playfair Display",serif;font-size:13px;color:#2C4A2E;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;}.mname{font-family:"Playfair Display",serif;font-size:20px;font-weight:700;margin:8px 0;}img{width:200px;height:200px;border-radius:8px;display:block;margin:12px auto;}.lbl{font-size:11px;color:#7A7568;letter-spacing:.08em;text-transform:uppercase;}.bar{height:4px;background:#C4922A;border-radius:2px;margin-bottom:10px;}</style>'
+    + '</head><body><div class="label"><div class="bar"></div><div class="brand">Old Chatham Creamery</div>'
+    + '<div class="mname">' + name + '</div>'
+    + '<img src="' + dataUrl + '"><div class="lbl">Scan to log maintenance</div></div></body></html>';
+  win.document.write(html);
   win.document.close();
+  win.onload = function() { win.print(); win.close(); };
 }
 
-// ── QR Scanner ──
 function maintOpenScanner() {
   document.getElementById('maint-scanner-overlay').style.display = 'block';
 }
@@ -2639,6 +2641,10 @@ function maintCloseScanner() {
 }
 
 function maintStartCamera() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    alert('Camera not supported on this device/browser.');
+    return;
+  }
   navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
     .then(function(stream) {
       maintScanStream = stream;
@@ -2646,8 +2652,8 @@ function maintStartCamera() {
       video.srcObject = stream;
       document.getElementById('maint-scan-start-btn').style.display = 'none';
       document.getElementById('maint-scan-stop-btn').style.display  = '';
-      document.getElementById('maint-scanner-status').textContent = 'Scanning\u2026 point at a QR code.';
-      maintScanTimer = setInterval(function() { maintScanFrame(); }, 200);
+      document.getElementById('maint-scanner-status').textContent = 'Scanning... point at a QR code.';
+      maintScanTimer = setInterval(maintScanFrame, 200);
     })
     .catch(function(err) {
       document.getElementById('maint-scanner-status').textContent = 'Camera error: ' + err.message;
@@ -2655,17 +2661,20 @@ function maintStartCamera() {
 }
 
 function maintStopCamera() {
-  if (maintScanStream) { maintScanStream.getTracks().forEach(function(t){ t.stop(); }); maintScanStream = null; }
+  if (maintScanStream) { maintScanStream.getTracks().forEach(function(t) { t.stop(); }); maintScanStream = null; }
   if (maintScanTimer)  { clearInterval(maintScanTimer); maintScanTimer = null; }
-  document.getElementById('maint-scan-start-btn').style.display = '';
-  document.getElementById('maint-scan-stop-btn').style.display  = 'none';
-  document.getElementById('maint-scanner-status').textContent = 'Press Start Camera to begin.';
+  var startBtn = document.getElementById('maint-scan-start-btn');
+  var stopBtn  = document.getElementById('maint-scan-stop-btn');
+  if (startBtn) startBtn.style.display = '';
+  if (stopBtn)  stopBtn.style.display  = 'none';
+  var status = document.getElementById('maint-scanner-status');
+  if (status) status.textContent = 'Press Start Camera to begin.';
 }
 
 function maintScanFrame() {
   var video  = document.getElementById('maint-scanner-video');
   var canvas = document.getElementById('maint-scanner-canvas');
-  if (!video.videoWidth) return;
+  if (!video || !video.videoWidth) return;
   canvas.width  = video.videoWidth;
   canvas.height = video.videoHeight;
   canvas.getContext('2d').drawImage(video, 0, 0);
@@ -2674,39 +2683,33 @@ function maintScanFrame() {
   if (code) {
     maintStopCamera();
     maintCloseScanner();
-    maintHandleScannedUrl(code.data);
+    var match = code.data.match(/#maint-([a-z0-9]+)/i);
+    if (match) {
+      var id = match[1];
+      var m  = maintMachines.find(function(x) { return x.id === id; });
+      if (m) { maintShowLog(id); }
+      else   { alert('Machine not found. Please check the QR code.'); }
+    } else {
+      alert('Not a valid maintenance QR code.');
+    }
   }
 }
 
-function maintHandleScannedUrl(url) {
-  var match = url.match(/#maint-([a-z0-9]+)/i);
-  if (match) {
-    var id = match[1];
-    var m  = maintMachines.find(function(x) { return x.id === id; });
-    if (m) { maintShowLog(id); }
-    else { alert('Machine not found. Make sure this app is loaded and the machine exists.'); }
-  } else {
-    alert('Not a valid maintenance QR code.');
-  }
-}
-
-// ── Deep-link on page load ──
 function maintCheckDeepLink() {
   var hash = window.location.hash;
-  if (hash.startsWith('#maint-')) {
+  if (hash.indexOf('#maint-') === 0) {
     var id = hash.slice(7);
     var m  = maintMachines.find(function(x) { return x.id === id; });
-    if (m) maintShowLog(id);
+    if (m) { maintShowLog(id); }
   }
 }
 
-// ── Init ──
 function maintInit() {
   maintLoadLocal();
   maintRenderHome();
   maintCheckDeepLink();
-  maintSyncFromCloud().then(function() {
-    maintPollTimer = setInterval(maintSyncFromCloud, 8000);
+  maintSync().then(function() {
+    setInterval(maintSync, 10000);
   });
 }
 
