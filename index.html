@@ -2619,7 +2619,7 @@ function maintRenderEntries() {
       + (e.tech ? '<span style="font-size:12px;color:var(--stone);font-style:italic;">by ' + mEsc(e.tech) + '</span>' : '')
       + '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase;' + badge + '">' + mEsc(e.type || 'other') + '</span>'
       + '</div>'
-      + '<div style="font-size:13px;color:var(--charcoal);line-height:1.55;margin-bottom:' + (e.parts ? '6' : '0') + 'px;">' + mEsc(e.work || '') + '</div>'
+      + '<div style="font-size:13px;color:var(--charcoal);line-height:1.55;white-space:pre-wrap;margin-bottom:' + (e.parts ? '6' : '0') + 'px;">' + mEsc(e.work || '') + '</div>'
       + (e.parts ? '<div style="font-size:11px;color:var(--stone);background:var(--parchment);padding:4px 9px;border-radius:4px;display:inline-block;font-family:\'DM Mono\',monospace;">Parts: ' + mEsc(e.parts) + '</div>' : '')
       + '<button onclick="maintDeleteEntry(\'' + e.id + '\')" style="position:absolute;top:12px;right:14px;background:none;border:none;cursor:pointer;color:#ccc;font-size:13px;" onmouseover="this.style.color=\'#B84040\';" onmouseout="this.style.color=\'#ccc\';">x</button>'
       + '</div>';
@@ -2896,7 +2896,7 @@ function tabletMaintRenderEntries() {
       + (e.tech ? '<span style="font-size:11px;color:#7A7568;font-style:italic;">by ' + mEsc(e.tech) + '</span>' : '')
       + '<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.05em;background:' + bg + ';color:' + clr + ';border:1px solid ' + clr + ';">' + mEsc(e.type || 'other') + '</span>'
       + '</div>'
-      + '<div style="font-size:13px;color:#2E2E2C;line-height:1.5;">' + mEsc(e.work || '') + '</div>'
+      + '<div style="font-size:13px;color:#2E2E2C;line-height:1.5;white-space:pre-wrap;">' + mEsc(e.work || '') + '</div>'
       + (e.parts ? '<div style="font-size:11px;color:#7A7568;margin-top:4px;font-family:monospace;">Parts: ' + mEsc(e.parts) + '</div>' : '')
       + '</div>';
   }).join('');
