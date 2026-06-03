@@ -352,13 +352,13 @@
       <div class="panel" style="margin-bottom:18px;">
         <div class="panel-header"><div class="panel-title"><i class="ti ti-pencil"></i> Log Maintenance</div></div>
         <div style="padding:16px 18px;">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
-            <div><label class="form-label">Date</label><input class="form-input" type="date" id="maint-entry-date" style="width:100%;max-width:100%;min-width:0;box-sizing:border-box;display:block;"></div>
-            <div><label class="form-label">Technician</label><input class="form-input" type="text" id="maint-entry-tech" placeholder="Your name" style="width:100%;max-width:100%;box-sizing:border-box;"></div>
+          <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:14px;">
+            <div style="min-width:0;overflow:hidden;"><label class="form-label">Date</label><input class="form-input" type="date" id="maint-entry-date" style="display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;"></div>
+            <div style="min-width:0;overflow:hidden;"><label class="form-label">Technician</label><input class="form-input" type="text" id="maint-entry-tech" placeholder="Your name" style="display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;"></div>
           </div>
-          <div class="form-row-2" style="gap:14px;margin-bottom:14px;">
-            <div><label class="form-label">Type</label>
-              <select class="form-input" id="maint-entry-type">
+          <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:14px;">
+            <div style="min-width:0;overflow:hidden;"><label class="form-label">Type</label>
+              <select class="form-input" id="maint-entry-type" style="display:block;width:100%;max-width:100%;box-sizing:border-box;">
                 <option value="routine">Routine Maintenance</option>
                 <option value="repair">Repair</option>
                 <option value="inspection">Inspection</option>
@@ -366,7 +366,7 @@
                 <option value="other">Other</option>
               </select>
             </div>
-            <div><label class="form-label">Parts / Materials (optional)</label><input class="form-input" type="text" id="maint-entry-parts" placeholder="e.g. Filter, O-ring"></div>
+            <div style="min-width:0;overflow:hidden;"><label class="form-label">Parts / Materials (optional)</label><input class="form-input" type="text" id="maint-entry-parts" placeholder="e.g. Filter, O-ring" style="display:block;width:100%;max-width:100%;box-sizing:border-box;"></div>
           </div>
           <div class="form-row"><label class="form-label">Work Performed *</label><textarea class="form-input" id="maint-entry-work" rows="3" placeholder="Describe the work done..." style="resize:vertical;"></textarea></div>
           <button class="btn-save" onclick="maintAddEntry()" style="width:100%;padding:10px;font-size:14px;">Save Entry</button>
