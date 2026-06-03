@@ -184,6 +184,7 @@
     grid-template-columns: 1fr !important;
     gap: 14px !important;
   }
+  input[type="date"] { display:block; width:100% !important; min-width:0 !important; max-width:100% !important; box-sizing:border-box !important; }
   .form-input, input[type="date"], input[type="text"], input[type="number"], select, textarea {
     width: 100% !important;
     max-width: 100% !important;
@@ -352,7 +353,7 @@
         <div class="panel-header"><div class="panel-title"><i class="ti ti-pencil"></i> Log Maintenance</div></div>
         <div style="padding:16px 18px;">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
-            <div><label class="form-label">Date</label><input class="form-input" type="date" id="maint-entry-date" style="width:100%;max-width:100%;box-sizing:border-box;"></div>
+            <div><label class="form-label">Date</label><input class="form-input" type="date" id="maint-entry-date" style="width:100%;max-width:100%;min-width:0;box-sizing:border-box;display:block;"></div>
             <div><label class="form-label">Technician</label><input class="form-input" type="text" id="maint-entry-tech" placeholder="Your name" style="width:100%;max-width:100%;box-sizing:border-box;"></div>
           </div>
           <div class="form-row-2" style="gap:14px;margin-bottom:14px;">
