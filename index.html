@@ -177,8 +177,10 @@
     .page{display:none;}
     .page.active{display:block;}
   
-@media (max-width: 600px) {
-  .form-row-2 {
+@media (max-width: 700px) {
+  .form-row-2,
+  div[style*="grid-template-columns:1fr 1fr"],
+  div[style*="grid-template-columns: 1fr 1fr"] {
     grid-template-columns: 1fr !important;
     gap: 14px !important;
   }
@@ -188,7 +190,6 @@
     box-sizing: border-box !important;
     min-width: 0 !important;
   }
-  /* Prevent any grid/flex child from overflowing */
   .page, .panel, .modal-body, [id^="inv-section-"] {
     overflow-x: hidden !important;
   }
@@ -350,9 +351,9 @@
       <div class="panel" style="margin-bottom:18px;">
         <div class="panel-header"><div class="panel-title"><i class="ti ti-pencil"></i> Log Maintenance</div></div>
         <div style="padding:16px 18px;">
-          <div class="form-row-2" style="gap:14px;margin-bottom:14px;">
-            <div><label class="form-label">Date</label><input class="form-input" type="date" id="maint-entry-date"></div>
-            <div><label class="form-label">Technician</label><input class="form-input" type="text" id="maint-entry-tech" placeholder="Your name"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+            <div><label class="form-label">Date</label><input class="form-input" type="date" id="maint-entry-date" style="width:100%;max-width:100%;box-sizing:border-box;"></div>
+            <div><label class="form-label">Technician</label><input class="form-input" type="text" id="maint-entry-tech" placeholder="Your name" style="width:100%;max-width:100%;box-sizing:border-box;"></div>
           </div>
           <div class="form-row-2" style="gap:14px;margin-bottom:14px;">
             <div><label class="form-label">Type</label>
