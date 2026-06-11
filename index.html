@@ -3282,6 +3282,7 @@ function pmSelectDay(ds) {
       + '<div style="font-size:14px;font-weight:600;color:var(--charcoal);' + (done?'text-decoration:line-through;':'') + '">' + mEsc(t.name) + '</div>'
       + '<div style="font-size:12px;color:var(--stone);font-family:\'DM Mono\',monospace;margin-top:2px;">' + mEsc(pmMachineName(t.machine_id)) + ' &middot; ' + pmRecurLabel(t) + '</div>'
       + (t.notes ? '<div style="font-size:12px;color:var(--stone);margin-top:4px;font-style:italic;">' + mEsc(t.notes) + '</div>' : '')
+      + (done ? '<div style="font-size:11px;color:var(--forest);margin-top:4px;font-weight:600;">&#10003; Completed by: ' + mEsc((pmCompletions.find(function(c){return c.task_id===t.id&&c.date===ds;})||{}).tech||'Unknown') + '</div>' : '')
       + '</label>'
       + '</div>';
   }).join('');
@@ -3422,20 +3423,31 @@ function pmRefreshAllViews() {
 function pmToggleComplete(taskId, dateStr) {
   var already = pmIsCompleted(taskId, dateStr);
   if (already) {
+    // Uncheck - remove completion
     pmCompletions = pmCompletions.filter(function(c) { return !(c.task_id === taskId && c.date === dateStr); });
     pmSaveLocal();
     pmRefreshAllViews();
     pmDeleteCompletionCloud(taskId, dateStr);
   } else {
-    var comp = { id: maintGenId(), task_id: taskId, date: dateStr, completed_at: new Date().toISOString() };
+    // Ask for technician name before saving
+    var savedTech = localStorage.getItem('occ_pm_last_tech') || '';
+    var tech = prompt('Who is completing this task?', savedTech);
+    if (tech === null) {
+      // User cancelled - uncheck the checkbox visually by re-rendering
+      pmRefreshAllViews();
+      return;
+    }
+    tech = tech.trim();
+    if (tech) localStorage.setItem('occ_pm_last_tech', tech);
+    var comp = { id: maintGenId(), task_id: taskId, date: dateStr, tech: tech, completed_at: new Date().toISOString() };
     pmCompletions.push(comp);
     pmSaveLocal();
     pmRefreshAllViews();
     pmPushCompletion(comp);
-    // Auto-log to maintenance
+    // Auto-log to maintenance history
     var task = pmTasks.find(function(t) { return t.id === taskId; });
     if (task && task.machine_id) {
-      var entry = { id: maintGenId(), machine_id: task.machine_id, date: dateStr, tech: '', type: 'routine',
+      var entry = { id: maintGenId(), machine_id: task.machine_id, date: dateStr, tech: tech, type: 'routine',
         work: 'PM: ' + task.name + (task.notes ? '\n' + task.notes : ''), parts: '', created_at: new Date().toISOString() };
       maintEntries.unshift(entry);
       maintSaveLocal();
