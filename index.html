@@ -3423,9 +3423,23 @@ function pmRefreshAllViews() {
 function pmToggleComplete(taskId, dateStr) {
   var already = pmIsCompleted(taskId, dateStr);
   if (already) {
-    // Uncheck - remove completion
+    // Uncheck - remove completion AND the matching maintenance log entry
     pmCompletions = pmCompletions.filter(function(c) { return !(c.task_id === taskId && c.date === dateStr); });
     pmSaveLocal();
+    // Remove the auto-generated maintenance entry for this PM + date
+    var task = pmTasks.find(function(t) { return t.id === taskId; });
+    var pmWorkPrefix = 'PM: ' + (task ? task.name : '');
+    var toDelete = maintEntries.filter(function(e) {
+      return e.machine_id === (task ? task.machine_id : null)
+          && e.date === dateStr
+          && e.work && e.work.indexOf(pmWorkPrefix) === 0;
+    });
+    toDelete.forEach(function(e) {
+      maintEntries = maintEntries.filter(function(x) { return x.id !== e.id; });
+      maintDeleteEntryCloud(e.id);
+    });
+    maintSaveLocal();
+    maintRefreshAllViews();
     pmRefreshAllViews();
     pmDeleteCompletionCloud(taskId, dateStr);
   } else {
