@@ -396,46 +396,52 @@
 
   <!-- PM SCHEDULE PAGE -->
   <div class="page" id="page-pm" style="overflow-x:hidden;">
-    <div style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;" id="pm-layout">
+    <div class="section-header">
+      <div class="section-title">PM Schedule</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary" onclick="pmPrevMonth()"><i class="ti ti-chevron-left"></i></button>
+        <div id="pm-month-label" style="font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:var(--forest);min-width:140px;text-align:center;line-height:32px;"></div>
+        <button class="btn btn-primary" onclick="pmNextMonth()"><i class="ti ti-chevron-right"></i></button>
+        <button class="btn btn-primary" onclick="pmGoToday()">Today</button>
+        <button class="btn btn-primary" onclick="pmShowAddForm()"><i class="ti ti-plus"></i> Add PM</button>
+      </div>
+    </div>
 
-      <!-- LEFT: Today + 7-day list -->
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;">
+
+      <!-- LEFT: Calendar -->
       <div>
-        <div class="section-header">
-          <div class="section-title">PM Schedule</div>
-          <div style="font-size:12px;color:var(--stone);font-family:'DM Mono',monospace;" id="pm-today-label"></div>
+        <!-- Day headers -->
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:2px;">
+          <div style="text-align:center;font-size:11px;font-weight:700;color:var(--stone);font-family:'DM Mono',monospace;padding:6px 0;">SUN</div>
+          <div style="text-align:center;font-size:11px;font-weight:700;color:var(--stone);font-family:'DM Mono',monospace;padding:6px 0;">MON</div>
+          <div style="text-align:center;font-size:11px;font-weight:700;color:var(--stone);font-family:'DM Mono',monospace;padding:6px 0;">TUE</div>
+          <div style="text-align:center;font-size:11px;font-weight:700;color:var(--stone);font-family:'DM Mono',monospace;padding:6px 0;">WED</div>
+          <div style="text-align:center;font-size:11px;font-weight:700;color:var(--stone);font-family:'DM Mono',monospace;padding:6px 0;">THU</div>
+          <div style="text-align:center;font-size:11px;font-weight:700;color:var(--stone);font-family:'DM Mono',monospace;padding:6px 0;">FRI</div>
+          <div style="text-align:center;font-size:11px;font-weight:700;color:var(--stone);font-family:'DM Mono',monospace;padding:6px 0;">SAT</div>
         </div>
+        <div id="pm-calendar-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;"></div>
 
-        <!-- Today -->
-        <div class="panel" style="margin-bottom:16px;">
+        <!-- Day detail panel -->
+        <div id="pm-day-detail" style="display:none;margin-top:16px;" class="panel">
           <div class="panel-header" style="background:var(--forest);">
-            <div class="panel-title" style="color:var(--cream);"><i class="ti ti-sun"></i> Today</div>
-            <div id="pm-today-count" style="font-size:11px;color:var(--gold-light);font-family:'DM Mono',monospace;"></div>
+            <div class="panel-title" style="color:var(--cream);" id="pm-day-detail-title"></div>
+            <button onclick="document.getElementById('pm-day-detail').style.display='none'" style="background:none;border:none;color:var(--cream);cursor:pointer;font-size:16px;">×</button>
           </div>
-          <div id="pm-today-list" style="padding:4px 0;"></div>
+          <div id="pm-day-detail-list" style="padding:4px 0;"></div>
         </div>
-
-        <!-- Next 7 days -->
-        <div id="pm-upcoming-days"></div>
       </div>
 
-      <!-- RIGHT: Add PM form -->
+      <!-- RIGHT: Add/Edit form + task list -->
       <div>
-        <div class="panel" style="position:sticky;top:80px;">
-          <div class="panel-header"><div class="panel-title"><i class="ti ti-plus"></i> <span id="pm-form-title">Add PM Task</span></div></div>
-          <div style="padding:16px 18px;">
-            <div class="form-row" style="margin-bottom:12px;">
-              <label class="form-label">Task Name *</label>
-              <input class="form-input" type="text" id="pm-task-name" placeholder="e.g. Check oil level">
-            </div>
-            <div class="form-row" style="margin-bottom:12px;">
-              <label class="form-label">Machine *</label>
-              <select class="form-input" id="pm-task-machine">
-                <option value="">-- Select Machine --</option>
-              </select>
-            </div>
-            <div class="form-row" style="margin-bottom:12px;">
-              <label class="form-label">Recurrence</label>
-              <select class="form-input" id="pm-task-recur">
+        <div class="panel" id="pm-form-panel" style="display:none;margin-bottom:16px;">
+          <div class="panel-header"><div class="panel-title"><i class="ti ti-pencil"></i> <span id="pm-form-title">Add PM Task</span></div></div>
+          <div style="padding:14px 16px;">
+            <div class="form-row" style="margin-bottom:10px;"><label class="form-label">Task Name *</label><input class="form-input" type="text" id="pm-task-name" placeholder="e.g. Check oil level"></div>
+            <div class="form-row" style="margin-bottom:10px;"><label class="form-label">Machine *</label><select class="form-input" id="pm-task-machine"><option value="">-- Select --</option></select></div>
+            <div class="form-row" style="margin-bottom:10px;"><label class="form-label">Recurrence</label>
+              <select class="form-input" id="pm-task-recur" onchange="document.getElementById('pm-custom-days-row').style.display=this.value==='custom'?'block':'none'">
                 <option value="daily">Daily</option>
                 <option value="weekly">Weekly</option>
                 <option value="biweekly">Every 2 Weeks</option>
@@ -445,28 +451,18 @@
                 <option value="custom">Custom (days)</option>
               </select>
             </div>
-            <div class="form-row" style="margin-bottom:12px;display:none;" id="pm-custom-days-row">
-              <label class="form-label">Every N Days</label>
-              <input class="form-input" type="number" id="pm-task-custom-days" min="1" placeholder="e.g. 45">
-            </div>
-            <div class="form-row" style="margin-bottom:12px;">
-              <label class="form-label">Start Date</label>
-              <input class="form-input" type="date" id="pm-task-start" style="width:100%;max-width:100%;box-sizing:border-box;">
-            </div>
-            <div class="form-row" style="margin-bottom:16px;">
-              <label class="form-label">Notes (optional)</label>
-              <textarea class="form-input" id="pm-task-notes" rows="2" placeholder="Instructions, parts needed..." style="resize:vertical;"></textarea>
-            </div>
+            <div class="form-row" style="margin-bottom:10px;display:none;" id="pm-custom-days-row"><label class="form-label">Every N Days</label><input class="form-input" type="number" id="pm-task-custom-days" min="1" placeholder="e.g. 45"></div>
+            <div class="form-row" style="margin-bottom:10px;"><label class="form-label">Start Date</label><input class="form-input" type="date" id="pm-task-start" style="width:100%;box-sizing:border-box;"></div>
+            <div class="form-row" style="margin-bottom:14px;"><label class="form-label">Notes (optional)</label><textarea class="form-input" id="pm-task-notes" rows="2" placeholder="Instructions, parts needed..." style="resize:vertical;"></textarea></div>
             <input type="hidden" id="pm-task-edit-id">
-            <button class="btn-save" onclick="pmSaveTask()" style="width:100%;padding:10px;">Save PM Task</button>
-            <div id="pm-form-cancel" style="display:none;margin-top:8px;">
-              <button class="btn-cancel" onclick="pmCancelEdit()" style="width:100%;">Cancel</button>
+            <div style="display:flex;gap:8px;">
+              <button class="btn-save" onclick="pmSaveTask()" style="flex:1;">Save</button>
+              <button class="btn-cancel" onclick="pmCancelEdit()" style="flex:1;">Cancel</button>
             </div>
           </div>
         </div>
 
-        <!-- Existing PMs list -->
-        <div class="panel" style="margin-top:16px;">
+        <div class="panel">
           <div class="panel-header"><div class="panel-title"><i class="ti ti-list"></i> All PM Tasks</div></div>
           <div id="pm-tasks-list" style="padding:4px 0;"></div>
         </div>
@@ -3074,60 +3070,60 @@ function tabletMaintAddEntry() {
 maintInit();
 
 // ================================================================
-// PM SCHEDULE MODULE
+// PM SCHEDULE MODULE (v2 - calendar view, snake_case Supabase)
 // ================================================================
-var pmTasks        = [];   // [{id, name, machineId, recur, customDays, startDate, notes}]
-var pmCompletions  = [];   // [{id, taskId, date, completedAt}]
-var pmEditId       = null;
+var pmTasks       = [];
+var pmCompletions = [];
+var pmEditId      = null;
+var pmViewYear    = new Date().getFullYear();
+var pmViewMonth   = new Date().getMonth(); // 0-indexed
+var pmSelectedDay = null;
 
-// ── Recurrence helpers ──────────────────────────────────────────
 var PM_RECUR_DAYS = { daily:1, weekly:7, biweekly:14, monthly:30, quarterly:91, yearly:365 };
 
 function pmRecurDays(task) {
-  if (task.recur === 'custom') return parseInt(task.customDays) || 30;
+  if (task.recur === 'custom') return parseInt(task.custom_days) || 30;
   return PM_RECUR_DAYS[task.recur] || 30;
 }
 
 function pmRecurLabel(task) {
-  var labels = { daily:'Daily', weekly:'Weekly', biweekly:'Every 2 Weeks', monthly:'Monthly', quarterly:'Quarterly', yearly:'Yearly' };
-  if (task.recur === 'custom') return 'Every ' + (task.customDays || '?') + ' days';
+  var labels = { daily:'Daily', weekly:'Weekly', biweekly:'Every 2 Wks', monthly:'Monthly', quarterly:'Quarterly', yearly:'Yearly' };
+  if (task.recur === 'custom') return 'Every ' + (task.custom_days || '?') + 'd';
   return labels[task.recur] || task.recur;
 }
 
-// Return dates this task is due within [fromDate, toDate] inclusive
-function pmDueDatesInRange(task, fromDate, toDate) {
-  var interval = pmRecurDays(task);
-  var start    = new Date(task.startDate + 'T00:00:00');
-  var from     = new Date(fromDate + 'T00:00:00');
-  var to       = new Date(toDate + 'T00:00:00');
-  var dates    = [];
-  if (start > to) return dates;
-  // Find first occurrence >= from
-  var diff = Math.floor((from - start) / 86400000);
-  var stepsNeeded = diff <= 0 ? 0 : Math.ceil(diff / interval);
-  var cur = new Date(start.getTime() + stepsNeeded * interval * 86400000);
-  while (cur <= to) {
-    var ds = cur.toISOString().slice(0, 10);
-    if (ds >= fromDate) dates.push(ds);
-    cur = new Date(cur.getTime() + interval * 86400000);
-  }
-  return dates;
+function pmTodayStr() {
+  return new Date().toISOString().slice(0,10);
+}
+
+function pmDateStr(y, m, d) {
+  return y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
 }
 
 function pmIsCompleted(taskId, dateStr) {
-  return pmCompletions.some(function(c) { return c.taskId === taskId && c.date === dateStr; });
+  return pmCompletions.some(function(c) { return c.task_id === taskId && c.date === dateStr; });
 }
 
-function pmTodayStr() {
-  return new Date().toISOString().slice(0, 10);
+function pmDueOnDate(task, dateStr) {
+  if (!task.start_date) return false;
+  var interval = pmRecurDays(task);
+  var start    = new Date(task.start_date + 'T00:00:00');
+  var check    = new Date(dateStr + 'T00:00:00');
+  if (check < start) return false;
+  var diff = Math.round((check - start) / 86400000);
+  return diff % interval === 0;
 }
 
-function pmFriendlyDate(ds) {
-  var d = new Date(ds + 'T00:00:00');
-  return d.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+function pmTasksDueOn(dateStr) {
+  return pmTasks.filter(function(t) { return pmDueOnDate(t, dateStr); });
 }
 
-// ── Local storage ───────────────────────────────────────────────
+function pmMachineName(id) {
+  var m = maintMachines.find(function(x) { return x.id === id; });
+  return m ? m.name : 'Unknown';
+}
+
+// ── Local storage ──────────────────────────────────────────────
 function pmSaveLocal() {
   try {
     localStorage.setItem('occ_pm_tasks',       JSON.stringify(pmTasks));
@@ -3142,7 +3138,7 @@ function pmLoadLocal() {
   } catch(e) { pmTasks = []; pmCompletions = []; }
 }
 
-// ── Supabase ────────────────────────────────────────────────────
+// ── Supabase ───────────────────────────────────────────────────
 function pmSbFetch(path, opts) {
   opts = opts || {};
   return fetch(SUPABASE_URL + '/rest/v1/' + path, {
@@ -3195,204 +3191,252 @@ function pmDeleteCompletionCloud(taskId, date) {
   return pmSbFetch('pm_completions?task_id=eq.' + taskId + '&date=eq.' + date, { method: 'DELETE' }).catch(function() {});
 }
 
-// ── Populate machine dropdowns ──────────────────────────────────
+// ── Populate machine dropdowns ─────────────────────────────────
 function pmPopulateMachineDropdowns() {
-  var opts = '<option value="">-- Select Machine --</option>'
-    + maintMachines.map(function(m) { return '<option value="' + m.id + '">' + mEsc(m.name) + '</option>'; }).join('');
-  var selectors = ['pm-task-machine', 'tablet-pm-machine'];
-  selectors.forEach(function(id) {
+  var opts = '<option value="">-- Select --</option>'
+    + maintMachines.map(function(m) {
+        return '<option value="' + m.id + '">' + mEsc(m.name) + '</option>';
+      }).join('');
+  ['pm-task-machine','tablet-pm-machine'].forEach(function(id) {
     var el = document.getElementById(id);
-    if (el) { var cur = el.value; el.innerHTML = opts; if (cur) el.value = cur; }
+    if (!el) return;
+    var cur = el.value;
+    el.innerHTML = opts;
+    if (cur) el.value = cur;
   });
 }
 
-// ── Render helpers ──────────────────────────────────────────────
-function pmMachineName(id) {
-  var m = maintMachines.find(function(x) { return x.id === id; });
-  return m ? m.name : 'Unknown Machine';
+// ── Calendar render ────────────────────────────────────────────
+function pmRenderCalendar() {
+  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var lbl = document.getElementById('pm-month-label');
+  if (lbl) lbl.textContent = monthNames[pmViewMonth] + ' ' + pmViewYear;
+
+  var grid = document.getElementById('pm-calendar-grid');
+  if (!grid) return;
+
+  var today    = pmTodayStr();
+  var firstDay = new Date(pmViewYear, pmViewMonth, 1).getDay(); // 0=Sun
+  var daysInMonth = new Date(pmViewYear, pmViewMonth + 1, 0).getDate();
+
+  var html = '';
+  // Empty cells before first day
+  for (var i = 0; i < firstDay; i++) {
+    html += '<div style="min-height:80px;background:var(--parchment);border-radius:6px;opacity:.3;"></div>';
+  }
+
+  for (var d = 1; d <= daysInMonth; d++) {
+    var ds       = pmDateStr(pmViewYear, pmViewMonth, d);
+    var isToday  = ds === today;
+    var tasks    = pmTasksDueOn(ds);
+    var doneAll  = tasks.length > 0 && tasks.every(function(t) { return pmIsCompleted(t.id, ds); });
+    var hasSome  = tasks.length > 0 && !doneAll;
+    var selected = ds === pmSelectedDay;
+
+    var bg = selected ? '#2C4A2E' : (isToday ? '#EAF0EA' : 'var(--cream)');
+    var border = selected ? '2px solid #2C4A2E' : (isToday ? '2px solid #2C4A2E' : '1px solid var(--border)');
+    var dayColor = selected ? '#fff' : (isToday ? '#2C4A2E' : 'var(--charcoal)');
+
+    html += '<div onclick="pmSelectDay(\'' + ds + '\')" style="min-height:80px;background:' + bg + ';border:' + border + ';border-radius:6px;padding:6px;cursor:' + (tasks.length ? 'pointer' : 'default') + ';transition:all .15s;">';
+    html += '<div style="font-size:12px;font-weight:700;color:' + dayColor + ';margin-bottom:4px;">' + d + '</div>';
+
+    if (doneAll) {
+      html += '<div style="background:#2C4A2E;color:#fff;border-radius:4px;padding:2px 5px;font-size:10px;font-family:monospace;margin-bottom:2px;">&#10003; ' + tasks.length + ' done</div>';
+    } else if (hasSome) {
+      var doneCount = tasks.filter(function(t) { return pmIsCompleted(t.id, ds); }).length;
+      html += '<div style="background:#C4922A;color:#fff;border-radius:4px;padding:2px 5px;font-size:10px;font-family:monospace;margin-bottom:2px;">' + doneCount + '/' + tasks.length + ' PM</div>';
+      // Show first 2 task names
+      tasks.slice(0, 2).forEach(function(t) {
+        html += '<div style="font-size:10px;color:' + (selected?'#ddd':'var(--stone)') + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + mEsc(t.name) + '</div>';
+      });
+      if (tasks.length > 2) html += '<div style="font-size:10px;color:' + (selected?'#ddd':'var(--stone)') + ';">+' + (tasks.length-2) + ' more</div>';
+    }
+
+    html += '</div>';
+  }
+
+  grid.innerHTML = html;
 }
 
-function pmBuildTaskItem(task, dateStr, isTablet) {
-  var done     = pmIsCompleted(task.id, dateStr);
-  var mName    = pmMachineName(task.machineId);
-  var checkId  = 'pmchk-' + task.id + '-' + dateStr;
-  var prefix   = isTablet ? 'tablet-' : '';
-  var fs       = isTablet ? '13px' : '13px';
-  var checkFn  = 'pmToggleComplete(\'' + task.id + '\',\'' + dateStr + '\')';
+function pmSelectDay(ds) {
+  var tasks = pmTasksDueOn(ds);
+  if (!tasks.length) {
+    pmSelectedDay = null;
+    document.getElementById('pm-day-detail').style.display = 'none';
+    pmRenderCalendar();
+    return;
+  }
+  pmSelectedDay = ds;
+  pmRenderCalendar();
 
-  return '<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-bottom:1px solid rgba(44,74,46,.1);' + (done ? 'opacity:.6;' : '') + '">'
-    + '<input type="checkbox" id="' + checkId + '" ' + (done ? 'checked' : '') + ' onchange="' + checkFn + '" style="margin-top:3px;width:16px;height:16px;accent-color:#2C4A2E;flex-shrink:0;cursor:pointer;">'
-    + '<label for="' + checkId + '" style="flex:1;cursor:pointer;">'
-    + '<div style="font-size:' + fs + ';font-weight:600;color:#1A1A18;' + (done ? 'text-decoration:line-through;' : '') + '">' + mEsc(task.name) + '</div>'
-    + '<div style="font-size:11px;color:#7A7568;font-family:monospace;margin-top:2px;">' + mEsc(mName) + ' &middot; ' + pmRecurLabel(task) + '</div>'
-    + (task.notes ? '<div style="font-size:11px;color:#7A7568;margin-top:3px;font-style:italic;">' + mEsc(task.notes) + '</div>' : '')
-    + '</label>'
-    + '</div>';
-}
+  var d   = new Date(ds + 'T00:00:00');
+  var ttl = d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+  document.getElementById('pm-day-detail-title').textContent = ttl;
 
-function pmBuildDayBlock(dateStr, tasks, isTablet) {
-  var items = tasks.map(function(t) { return pmBuildTaskItem(t, dateStr, isTablet); }).join('');
-  if (!items) return '';
-  var doneCount  = tasks.filter(function(t) { return pmIsCompleted(t.id, dateStr); }).length;
-  var totalCount = tasks.length;
-  var allDone    = doneCount === totalCount;
-  var label      = pmFriendlyDate(dateStr);
-  if (isTablet) {
-    return '<div style="margin-bottom:12px;">'
-      + '<div style="background:' + (allDone ? '#3a6b3a' : '#4a6741') + ';color:#F5F0E8;padding:8px 12px;border-radius:8px 8px 0 0;display:flex;justify-content:space-between;align-items:center;">'
-      + '<div style="font-size:13px;font-weight:600;font-family:Georgia,serif;">' + label + '</div>'
-      + '<div style="font-size:11px;font-family:monospace;color:#E8B84B;">' + doneCount + '/' + totalCount + '</div>'
-      + '</div>'
-      + '<div style="background:#F5F0E8;border:1px solid rgba(44,74,46,.18);border-top:none;border-radius:0 0 8px 8px;">' + items + '</div>'
+  var html = tasks.map(function(t) {
+    var done    = pmIsCompleted(t.id, ds);
+    var checkId = 'pmchk-' + t.id + '-' + ds;
+    return '<div style="display:flex;align-items:flex-start;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);' + (done?'opacity:.65;':'') + '">'
+      + '<input type="checkbox" id="' + checkId + '" ' + (done?'checked':'') + ' onchange="pmToggleComplete(\'' + t.id + '\',\'' + ds + '\')" style="margin-top:3px;width:17px;height:17px;accent-color:#2C4A2E;flex-shrink:0;cursor:pointer;">'
+      + '<label for="' + checkId + '" style="flex:1;cursor:pointer;">'
+      + '<div style="font-size:14px;font-weight:600;color:var(--charcoal);' + (done?'text-decoration:line-through;':'') + '">' + mEsc(t.name) + '</div>'
+      + '<div style="font-size:12px;color:var(--stone);font-family:\'DM Mono\',monospace;margin-top:2px;">' + mEsc(pmMachineName(t.machine_id)) + ' &middot; ' + pmRecurLabel(t) + '</div>'
+      + (t.notes ? '<div style="font-size:12px;color:var(--stone);margin-top:4px;font-style:italic;">' + mEsc(t.notes) + '</div>' : '')
+      + '</label>'
       + '</div>';
-  }
-  return '<div class="panel" style="margin-bottom:12px;">'
-    + '<div class="panel-header" style="background:' + (allDone ? 'var(--forest2,#3a5c3a)' : 'var(--stone)') + ';">'
-    + '<div class="panel-title" style="color:var(--cream);">' + label + '</div>'
-    + '<div style="font-size:11px;font-family:\'DM Mono\',monospace;color:var(--cream);opacity:.8;">' + doneCount + '/' + totalCount + ' done</div>'
-    + '</div>'
-    + '<div>' + items + '</div></div>';
+  }).join('');
+
+  document.getElementById('pm-day-detail-list').innerHTML = html;
+  document.getElementById('pm-day-detail').style.display = 'block';
+  document.getElementById('pm-day-detail').scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
-// ── Refresh all PM views ────────────────────────────────────────
-function pmRefreshAllViews() {
-  pmPopulateMachineDropdowns();
-  pmRenderSchedule(false);
-  pmRenderSchedule(true);
-  pmRenderTasksList(false);
-  pmRenderTasksList(true);
+function pmPrevMonth() {
+  pmViewMonth--;
+  if (pmViewMonth < 0) { pmViewMonth = 11; pmViewYear--; }
+  pmSelectedDay = null;
+  document.getElementById('pm-day-detail').style.display = 'none';
+  pmRenderCalendar();
 }
 
-function pmRenderSchedule(isTablet) {
-  var today     = pmTodayStr();
-  var todayDate = new Date(today + 'T00:00:00');
-  var days      = [today];
-  for (var i = 1; i <= 7; i++) {
-    var d = new Date(todayDate.getTime() + i * 86400000);
-    days.push(d.toISOString().slice(0, 10));
-  }
-
-  // Build a map of date -> tasks due
-  var dayMap = {};
-  days.forEach(function(d) { dayMap[d] = []; });
-  pmTasks.forEach(function(task) {
-    days.forEach(function(d) {
-      var due = pmDueDatesInRange(task, d, d);
-      if (due.length) dayMap[d].push(task);
-    });
-  });
-
-  if (!isTablet) {
-    // Desktop: today label
-    var lbl = document.getElementById('pm-today-label');
-    if (lbl) lbl.textContent = pmFriendlyDate(today);
-
-    // Today block
-    var todayTasks = dayMap[today];
-    var todayDone  = todayTasks.filter(function(t) { return pmIsCompleted(t.id, today); }).length;
-    var todayEl    = document.getElementById('pm-today-list');
-    var todayCount = document.getElementById('pm-today-count');
-    if (todayCount) todayCount.textContent = todayDone + '/' + todayTasks.length + ' done';
-    if (todayEl) {
-      if (!todayTasks.length) {
-        todayEl.innerHTML = '<div style="text-align:center;padding:24px;color:var(--stone);font-size:13px;">No PMs due today.</div>';
-      } else {
-        todayEl.innerHTML = todayTasks.map(function(t) { return pmBuildTaskItem(t, today, false); }).join('');
-      }
-    }
-
-    // Upcoming days
-    var upcomingEl = document.getElementById('pm-upcoming-days');
-    if (upcomingEl) {
-      var html = '';
-      for (var i = 1; i <= 7; i++) {
-        var d = days[i];
-        html += pmBuildDayBlock(d, dayMap[d], false);
-      }
-      upcomingEl.innerHTML = html || '<div style="color:var(--stone);font-size:13px;padding:8px;">No upcoming PMs in the next 7 days.</div>';
-    }
-  } else {
-    // Tablet: today
-    var tabTodayTasks = dayMap[today];
-    var tabTodayDone  = tabTodayTasks.filter(function(t) { return pmIsCompleted(t.id, today); }).length;
-    var tabCount = document.getElementById('tablet-pm-today-count');
-    if (tabCount) tabCount.textContent = tabTodayDone + '/' + tabTodayTasks.length + ' done';
-    var tabToday = document.getElementById('tablet-pm-today-list');
-    if (tabToday) {
-      if (!tabTodayTasks.length) {
-        tabToday.innerHTML = '<div style="text-align:center;padding:20px;color:#7A7568;font-size:13px;">No PMs due today.</div>';
-      } else {
-        tabToday.innerHTML = tabTodayTasks.map(function(t) { return pmBuildTaskItem(t, today, true); }).join('');
-      }
-    }
-
-    // Tablet upcoming
-    var tabUpcoming = document.getElementById('tablet-pm-upcoming');
-    if (tabUpcoming) {
-      var html2 = '';
-      for (var j = 1; j <= 7; j++) {
-        var d2 = days[j];
-        html2 += pmBuildDayBlock(d2, dayMap[d2], true);
-      }
-      tabUpcoming.innerHTML = html2;
-    }
-  }
+function pmNextMonth() {
+  pmViewMonth++;
+  if (pmViewMonth > 11) { pmViewMonth = 0; pmViewYear++; }
+  pmSelectedDay = null;
+  document.getElementById('pm-day-detail').style.display = 'none';
+  pmRenderCalendar();
 }
 
+function pmGoToday() {
+  pmViewYear  = new Date().getFullYear();
+  pmViewMonth = new Date().getMonth();
+  pmSelectedDay = null;
+  document.getElementById('pm-day-detail').style.display = 'none';
+  pmRenderCalendar();
+}
+
+// ── Task list render ───────────────────────────────────────────
 function pmRenderTasksList(isTablet) {
   var elId = isTablet ? 'tablet-pm-tasks-list' : 'pm-tasks-list';
   var el   = document.getElementById(elId);
   if (!el) return;
   if (!pmTasks.length) {
-    el.innerHTML = '<div style="text-align:center;padding:20px;color:' + (isTablet ? '#7A7568' : 'var(--stone)') + ';font-size:13px;">No PM tasks yet. Add one to get started.</div>';
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--stone);font-size:13px;">No PM tasks yet.</div>';
     return;
   }
   el.innerHTML = pmTasks.map(function(t) {
-    var mName = pmMachineName(t.machineId);
-    return '<div style="padding:10px 14px;border-bottom:1px solid ' + (isTablet ? 'rgba(44,74,46,.1)' : 'var(--border)') + ';display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">'
+    return '<div style="padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">'
       + '<div style="flex:1;min-width:0;">'
-      + '<div style="font-size:13px;font-weight:600;color:' + (isTablet ? '#1A1A18' : 'var(--charcoal)') + ';">' + mEsc(t.name) + '</div>'
-      + '<div style="font-size:11px;color:' + (isTablet ? '#7A7568' : 'var(--stone)') + ';font-family:monospace;margin-top:2px;">' + mEsc(mName) + ' &middot; ' + pmRecurLabel(t) + ' &middot; starts ' + t.startDate + '</div>'
-      + (t.notes ? '<div style="font-size:11px;color:' + (isTablet ? '#7A7568' : 'var(--stone)') + ';font-style:italic;margin-top:2px;">' + mEsc(t.notes) + '</div>' : '')
+      + '<div style="font-size:13px;font-weight:600;color:var(--charcoal);">' + mEsc(t.name) + '</div>'
+      + '<div style="font-size:11px;color:var(--stone);font-family:\'DM Mono\',monospace;margin-top:2px;">' + mEsc(pmMachineName(t.machine_id)) + ' &middot; ' + pmRecurLabel(t) + ' &middot; starts ' + (t.start_date||'') + '</div>'
+      + (t.notes ? '<div style="font-size:11px;color:var(--stone);font-style:italic;margin-top:2px;">' + mEsc(t.notes) + '</div>' : '')
       + '</div>'
-      + '<div style="display:flex;gap:6px;flex-shrink:0;">'
-      + '<button onclick="pmEditTask(\'' + t.id + '\')" style="background:transparent;border:1px solid ' + (isTablet ? 'rgba(44,74,46,.3)' : 'var(--border-strong)') + ';border-radius:5px;padding:4px 8px;font-size:11px;cursor:pointer;color:' + (isTablet ? '#2C4A2E' : 'var(--forest)') + ';">Edit</button>'
-      + '<button onclick="pmDeleteTask(\'' + t.id + '\')" style="background:#B84040;border:none;border-radius:5px;padding:4px 8px;font-size:11px;cursor:pointer;color:#fff;">Del</button>'
+      + '<div style="display:flex;gap:5px;flex-shrink:0;">'
+      + '<button onclick="pmEditTask(\'' + t.id + '\')" style="background:transparent;border:1px solid var(--border-strong);border-radius:5px;padding:3px 8px;font-size:11px;cursor:pointer;color:var(--forest);">Edit</button>'
+      + '<button onclick="pmDeleteTask(\'' + t.id + '\')" style="background:#B84040;border:none;border-radius:5px;padding:3px 8px;font-size:11px;cursor:pointer;color:#fff;">Del</button>'
       + '</div></div>';
   }).join('');
 }
 
-// ── Toggle complete ─────────────────────────────────────────────
+// ── Tablet calendar render (compact list view) ─────────────────
+function pmRenderTabletSchedule() {
+  var today = pmTodayStr();
+  // Show today + 13 days
+  var days = [];
+  for (var i = 0; i <= 13; i++) {
+    var d = new Date(new Date(today + 'T00:00:00').getTime() + i * 86400000);
+    days.push(d.toISOString().slice(0,10));
+  }
+
+  var todayTasks = pmTasksDueOn(today);
+  var todayDone  = todayTasks.filter(function(t) { return pmIsCompleted(t.id, today); }).length;
+
+  // Today count badge
+  var tc = document.getElementById('tablet-pm-today-count');
+  if (tc) tc.textContent = todayDone + '/' + todayTasks.length + ' done';
+
+  // Today list
+  var tl = document.getElementById('tablet-pm-today-list');
+  if (tl) {
+    if (!todayTasks.length) {
+      tl.innerHTML = '<div style="text-align:center;padding:16px;color:#7A7568;font-size:13px;">No PMs due today.</div>';
+    } else {
+      tl.innerHTML = todayTasks.map(function(t) {
+        var done    = pmIsCompleted(t.id, today);
+        var checkId = 'tpmchk-' + t.id + '-' + today;
+        return '<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-bottom:1px solid rgba(44,74,46,.1);' + (done?'opacity:.6;':'') + '">'
+          + '<input type="checkbox" id="' + checkId + '" ' + (done?'checked':'') + ' onchange="pmToggleComplete(\'' + t.id + '\',\'' + today + '\')" style="margin-top:3px;width:16px;height:16px;accent-color:#2C4A2E;flex-shrink:0;cursor:pointer;">'
+          + '<label for="' + checkId + '" style="flex:1;cursor:pointer;">'
+          + '<div style="font-size:13px;font-weight:600;color:#1A1A18;' + (done?'text-decoration:line-through;':'') + '">' + mEsc(t.name) + '</div>'
+          + '<div style="font-size:11px;color:#7A7568;font-family:monospace;margin-top:2px;">' + mEsc(pmMachineName(t.machine_id)) + ' &middot; ' + pmRecurLabel(t) + '</div>'
+          + (t.notes ? '<div style="font-size:11px;color:#7A7568;font-style:italic;margin-top:2px;">' + mEsc(t.notes) + '</div>' : '')
+          + '</label></div>';
+      }).join('');
+    }
+  }
+
+  // Upcoming days
+  var up = document.getElementById('tablet-pm-upcoming');
+  if (up) {
+    var html = '';
+    for (var j = 1; j < days.length; j++) {
+      var ds = days[j];
+      var dt = pmTasksDueOn(ds);
+      if (!dt.length) continue;
+      var dc = dt.filter(function(t) { return pmIsCompleted(t.id, ds); }).length;
+      var dd = new Date(ds + 'T00:00:00').toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+      html += '<div style="margin-bottom:10px;">'
+        + '<div style="background:#4a6741;color:#F5F0E8;padding:7px 12px;border-radius:8px 8px 0 0;display:flex;justify-content:space-between;">'
+        + '<div style="font-size:13px;font-weight:600;font-family:Georgia,serif;">' + dd + '</div>'
+        + '<div style="font-size:11px;font-family:monospace;color:#E8B84B;">' + dc + '/' + dt.length + '</div>'
+        + '</div><div style="background:#F5F0E8;border:1px solid rgba(44,74,46,.18);border-top:none;border-radius:0 0 8px 8px;">'
+        + dt.map(function(t) {
+            var done    = pmIsCompleted(t.id, ds);
+            var checkId = 'tpmchk-' + t.id + '-' + ds;
+            return '<div style="display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-bottom:1px solid rgba(44,74,46,.08);' + (done?'opacity:.6;':'') + '">'
+              + '<input type="checkbox" id="' + checkId + '" ' + (done?'checked':'') + ' onchange="pmToggleComplete(\'' + t.id + '\',\'' + ds + '\')" style="margin-top:2px;width:15px;height:15px;accent-color:#2C4A2E;flex-shrink:0;cursor:pointer;">'
+              + '<label for="' + checkId + '" style="flex:1;cursor:pointer;">'
+              + '<div style="font-size:12px;font-weight:600;color:#1A1A18;' + (done?'text-decoration:line-through;':'') + '">' + mEsc(t.name) + '</div>'
+              + '<div style="font-size:10px;color:#7A7568;font-family:monospace;">' + mEsc(pmMachineName(t.machine_id)) + '</div>'
+              + '</label></div>';
+          }).join('')
+        + '</div></div>';
+    }
+    up.innerHTML = html || '<div style="text-align:center;padding:16px;color:#7A7568;font-size:12px;">No PMs in the next 13 days.</div>';
+  }
+
+  pmRenderTasksList(true);
+}
+
+// ── Refresh all ────────────────────────────────────────────────
+function pmRefreshAllViews() {
+  pmPopulateMachineDropdowns();
+  pmRenderCalendar();
+  pmRenderTasksList(false);
+  pmRenderTabletSchedule();
+  // Re-render day detail if open
+  if (pmSelectedDay) pmSelectDay(pmSelectedDay);
+}
+
+// ── Toggle complete ────────────────────────────────────────────
 function pmToggleComplete(taskId, dateStr) {
   var already = pmIsCompleted(taskId, dateStr);
   if (already) {
-    // Uncheck
-    pmCompletions = pmCompletions.filter(function(c) { return !(c.taskId === taskId && c.date === dateStr); });
+    pmCompletions = pmCompletions.filter(function(c) { return !(c.task_id === taskId && c.date === dateStr); });
     pmSaveLocal();
     pmRefreshAllViews();
     pmDeleteCompletionCloud(taskId, dateStr);
   } else {
-    // Check - create completion + auto-log to maintenance
     var comp = { id: maintGenId(), task_id: taskId, date: dateStr, completed_at: new Date().toISOString() };
-    // Store locally with camelCase too for easier lookup
-    pmCompletions.push({ id: comp.id, taskId: taskId, date: dateStr, completedAt: comp.completed_at });
+    pmCompletions.push(comp);
     pmSaveLocal();
     pmRefreshAllViews();
     pmPushCompletion(comp);
-
-    // Auto-log to maintenance history
-    var task  = pmTasks.find(function(t) { return t.id === taskId; });
-    if (task) {
-      var entry = {
-        id: maintGenId(),
-        machine_id: task.machineId,
-        date: dateStr,
-        tech: '',
-        type: 'routine',
-        work: 'PM: ' + task.name + (task.notes ? '\n' + task.notes : ''),
-        parts: '',
-        created_at: new Date().toISOString()
-      };
+    // Auto-log to maintenance
+    var task = pmTasks.find(function(t) { return t.id === taskId; });
+    if (task && task.machine_id) {
+      var entry = { id: maintGenId(), machine_id: task.machine_id, date: dateStr, tech: '', type: 'routine',
+        work: 'PM: ' + task.name + (task.notes ? '\n' + task.notes : ''), parts: '', created_at: new Date().toISOString() };
       maintEntries.unshift(entry);
       maintSaveLocal();
       maintRefreshAllViews();
@@ -3401,25 +3445,32 @@ function pmToggleComplete(taskId, dateStr) {
   }
 }
 
-// ── Save / Edit / Delete tasks ──────────────────────────────────
+// ── Save / Edit / Delete ───────────────────────────────────────
+function pmShowAddForm() {
+  pmCancelEdit();
+  document.getElementById('pm-form-panel').style.display = 'block';
+  document.getElementById('pm-task-name').focus();
+}
+
 function pmSaveTask() {
   var name   = document.getElementById('pm-task-name').value.trim();
   var machId = document.getElementById('pm-task-machine').value;
   var recur  = document.getElementById('pm-task-recur').value;
-  var custom = document.getElementById('pm-task-custom-days').value;
+  var custom = document.getElementById('pm-task-custom-days').value.trim();
   var start  = document.getElementById('pm-task-start').value || pmTodayStr();
   var notes  = document.getElementById('pm-task-notes').value.trim();
   if (!name)  { alert('Task name is required.'); return; }
   if (!machId){ alert('Please select a machine.'); return; }
 
-  if (pmEditId) {
-    var idx = pmTasks.findIndex(function(t) { return t.id === pmEditId; });
+  var editId = document.getElementById('pm-task-edit-id').value;
+  if (editId) {
+    var idx = pmTasks.findIndex(function(t) { return t.id === editId; });
     if (idx >= 0) {
-      pmTasks[idx] = Object.assign(pmTasks[idx], { name:name, machineId:machId, recur:recur, customDays:custom, startDate:start, notes:notes });
+      pmTasks[idx] = Object.assign(pmTasks[idx], { name:name, machine_id:machId, recur:recur, custom_days:custom, start_date:start, notes:notes });
       pmPushTask(pmTasks[idx]);
     }
   } else {
-    var t = { id: maintGenId(), name:name, machineId:machId, recur:recur, customDays:custom, startDate:start, notes:notes, created_at: new Date().toISOString() };
+    var t = { id: maintGenId(), name:name, machine_id:machId, recur:recur, custom_days:custom, start_date:start, notes:notes, created_at: new Date().toISOString() };
     pmTasks.push(t);
     pmPushTask(t);
   }
@@ -3430,35 +3481,32 @@ function pmSaveTask() {
 
 function pmCancelEdit() {
   pmEditId = null;
-  document.getElementById('pm-task-name').value    = '';
-  document.getElementById('pm-task-machine').value = '';
-  document.getElementById('pm-task-recur').value   = 'monthly';
+  document.getElementById('pm-task-name').value        = '';
+  document.getElementById('pm-task-machine').value     = '';
+  document.getElementById('pm-task-recur').value       = 'monthly';
   document.getElementById('pm-task-custom-days').value = '';
-  document.getElementById('pm-task-start').value   = pmTodayStr();
-  document.getElementById('pm-task-notes').value   = '';
-  document.getElementById('pm-task-edit-id').value = '';
+  document.getElementById('pm-task-start').value       = pmTodayStr();
+  document.getElementById('pm-task-notes').value       = '';
+  document.getElementById('pm-task-edit-id').value     = '';
   document.getElementById('pm-form-title').textContent = 'Add PM Task';
-  document.getElementById('pm-form-cancel').style.display = 'none';
   document.getElementById('pm-custom-days-row').style.display = 'none';
+  document.getElementById('pm-form-panel').style.display = 'none';
 }
 
 function pmEditTask(id) {
   var t = pmTasks.find(function(x) { return x.id === id; });
   if (!t) return;
   pmEditId = id;
-  document.getElementById('pm-task-name').value    = t.name;
-  document.getElementById('pm-task-machine').value = t.machineId;
-  document.getElementById('pm-task-recur').value   = t.recur;
-  document.getElementById('pm-task-custom-days').value = t.customDays || '';
-  document.getElementById('pm-task-start').value   = t.startDate;
-  document.getElementById('pm-task-notes').value   = t.notes || '';
-  document.getElementById('pm-task-edit-id').value = id;
+  pmShowAddForm();
+  document.getElementById('pm-task-name').value        = t.name;
+  document.getElementById('pm-task-machine').value     = t.machine_id;
+  document.getElementById('pm-task-recur').value       = t.recur;
+  document.getElementById('pm-task-custom-days').value = t.custom_days || '';
+  document.getElementById('pm-task-start').value       = t.start_date || '';
+  document.getElementById('pm-task-notes').value       = t.notes || '';
+  document.getElementById('pm-task-edit-id').value     = id;
   document.getElementById('pm-form-title').textContent = 'Edit PM Task';
-  document.getElementById('pm-form-cancel').style.display = 'block';
   document.getElementById('pm-custom-days-row').style.display = t.recur === 'custom' ? 'block' : 'none';
-  // Scroll to form
-  var form = document.getElementById('pm-task-name');
-  if (form) form.scrollIntoView({ behavior: 'smooth', block: 'center' });
   switchTab('pm', document.getElementById('tab-pm'));
 }
 
@@ -3466,24 +3514,19 @@ function pmDeleteTask(id) {
   var t = pmTasks.find(function(x) { return x.id === id; });
   if (!confirm('Delete "' + (t ? t.name : 'this PM') + '"?')) return;
   pmTasks       = pmTasks.filter(function(x) { return x.id !== id; });
-  pmCompletions = pmCompletions.filter(function(c) { return c.taskId !== id; });
+  pmCompletions = pmCompletions.filter(function(c) { return c.task_id !== id; });
   pmSaveLocal();
   pmRefreshAllViews();
   pmDeleteTaskCloud(id);
 }
 
-// Toggle custom days field
-document.getElementById('pm-task-recur').addEventListener('change', function() {
-  document.getElementById('pm-custom-days-row').style.display = this.value === 'custom' ? 'block' : 'none';
-});
-
-// ── Tablet PM helpers ───────────────────────────────────────────
+// ── Tablet form helpers ────────────────────────────────────────
 function tabletPmToggleForm() {
   var form = document.getElementById('tablet-pm-form');
   var btn  = document.getElementById('tablet-pm-add-btn');
   if (form.style.display === 'none') {
     form.style.display = 'block';
-    btn.textContent    = 'Close';
+    btn.textContent = 'Close';
     document.getElementById('tablet-pm-start').value = pmTodayStr();
     pmPopulateMachineDropdowns();
   } else {
@@ -3494,27 +3537,27 @@ function tabletPmToggleForm() {
 function tabletPmCancelEdit() {
   document.getElementById('tablet-pm-form').style.display = 'none';
   document.getElementById('tablet-pm-add-btn').textContent = '+ Add PM';
-  document.getElementById('tablet-pm-name').value     = '';
-  document.getElementById('tablet-pm-machine').value  = '';
-  document.getElementById('tablet-pm-recur').value    = 'monthly';
+  document.getElementById('tablet-pm-name').value        = '';
+  document.getElementById('tablet-pm-machine').value     = '';
+  document.getElementById('tablet-pm-recur').value       = 'monthly';
   document.getElementById('tablet-pm-custom-days').value = '';
-  document.getElementById('tablet-pm-start').value    = pmTodayStr();
-  document.getElementById('tablet-pm-notes').value    = '';
-  document.getElementById('tablet-pm-edit-id').value  = '';
+  document.getElementById('tablet-pm-start').value       = pmTodayStr();
+  document.getElementById('tablet-pm-notes').value       = '';
+  document.getElementById('tablet-pm-edit-id').value     = '';
   document.getElementById('tablet-pm-form-title').textContent = 'Add PM Task';
   document.getElementById('tablet-pm-custom-row').style.display = 'none';
 }
 
 function tabletPmToggleCustom() {
-  var val = document.getElementById('tablet-pm-recur').value;
-  document.getElementById('tablet-pm-custom-row').style.display = val === 'custom' ? 'block' : 'none';
+  document.getElementById('tablet-pm-custom-row').style.display =
+    document.getElementById('tablet-pm-recur').value === 'custom' ? 'block' : 'none';
 }
 
 function tabletPmSaveTask() {
   var name   = document.getElementById('tablet-pm-name').value.trim();
   var machId = document.getElementById('tablet-pm-machine').value;
   var recur  = document.getElementById('tablet-pm-recur').value;
-  var custom = document.getElementById('tablet-pm-custom-days').value;
+  var custom = document.getElementById('tablet-pm-custom-days').value.trim();
   var start  = document.getElementById('tablet-pm-start').value || pmTodayStr();
   var notes  = document.getElementById('tablet-pm-notes').value.trim();
   var editId = document.getElementById('tablet-pm-edit-id').value;
@@ -3524,11 +3567,11 @@ function tabletPmSaveTask() {
   if (editId) {
     var idx = pmTasks.findIndex(function(t) { return t.id === editId; });
     if (idx >= 0) {
-      pmTasks[idx] = Object.assign(pmTasks[idx], { name:name, machineId:machId, recur:recur, customDays:custom, startDate:start, notes:notes });
+      pmTasks[idx] = Object.assign(pmTasks[idx], { name:name, machine_id:machId, recur:recur, custom_days:custom, start_date:start, notes:notes });
       pmPushTask(pmTasks[idx]);
     }
   } else {
-    var t = { id: maintGenId(), name:name, machineId:machId, recur:recur, customDays:custom, startDate:start, notes:notes, created_at: new Date().toISOString() };
+    var t = { id: maintGenId(), name:name, machine_id:machId, recur:recur, custom_days:custom, start_date:start, notes:notes, created_at: new Date().toISOString() };
     pmTasks.push(t);
     pmPushTask(t);
   }
@@ -3537,7 +3580,7 @@ function tabletPmSaveTask() {
   pmRefreshAllViews();
 }
 
-// Hook into showInvSection for pm tab
+// Hook showInvSection for pm
 var _origShowInvSection_pm = showInvSection;
 showInvSection = function(section) {
   _origShowInvSection_pm(section);
@@ -3547,17 +3590,15 @@ showInvSection = function(section) {
   }
 };
 
-// ── Init ────────────────────────────────────────────────────────
+// ── Init ───────────────────────────────────────────────────────
 function pmInit() {
   pmLoadLocal();
-  document.getElementById('pm-task-start').value = pmTodayStr();
   pmRefreshAllViews();
-  pmSync().then(function() {
-    setInterval(pmSync, 5000);
-  });
+  pmSync().then(function() { setInterval(pmSync, 5000); });
 }
 
 pmInit();
+
 
 
 </script>
