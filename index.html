@@ -337,6 +337,7 @@
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn btn-primary" onclick="maintOpenScanner()"><i class="ti ti-scan" style="font-size:13px;"></i> Scan QR</button>
           <button class="btn btn-primary" onclick="maintShowAddMachineModal()"><i class="ti ti-plus" style="font-size:13px;"></i> Add Machine</button>
+          <button class="btn btn-primary" onclick="maintShowAuditModal()"><i class="ti ti-file-text" style="font-size:13px;"></i> Audit Report</button>
         </div>
       </div>
       <div id="maint-machines-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;"></div>
@@ -917,6 +918,42 @@
     </div>
     <div id="tablet-pm-tasks-list" style="background:#F5F0E8;border:1px solid rgba(44,74,46,.18);border-top:none;border-radius:0 0 10px 10px;min-height:48px;"></div>
   </div>
+
+
+<!-- MAINTENANCE: AUDIT REPORT MODAL -->
+<div class="modal-overlay" id="maint-audit-modal">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header"><h3>Generate Audit Report</h3><button class="modal-close" onclick="closeModal('maint-audit-modal')">x</button></div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--stone);margin-bottom:16px;">Select a date range to generate a printable maintenance log for auditing or email.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div><label class="form-label">From</label><input class="form-input" type="date" id="audit-from" style="width:100%;box-sizing:border-box;"></div>
+        <div><label class="form-label">To</label><input class="form-input" type="date" id="audit-to" style="width:100%;box-sizing:border-box;"></div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <label class="form-label">Quick Select</label>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">
+          <button onclick="auditQuickSelect(1)" class="btn btn-sm" style="background:var(--forest-pale);border:1px solid var(--border-strong);color:var(--forest);">Last Month</button>
+          <button onclick="auditQuickSelect(3)" class="btn btn-sm" style="background:var(--forest-pale);border:1px solid var(--border-strong);color:var(--forest);">Last 3 Months</button>
+          <button onclick="auditQuickSelect(6)" class="btn btn-sm" style="background:var(--forest-pale);border:1px solid var(--border-strong);color:var(--forest);">Last 6 Months</button>
+          <button onclick="auditQuickSelect(12)" class="btn btn-sm" style="background:var(--forest-pale);border:1px solid var(--border-strong);color:var(--forest);">Last Year</button>
+          <button onclick="auditQuickSelectYTD()" class="btn btn-sm" style="background:var(--forest-pale);border:1px solid var(--border-strong);color:var(--forest);">Year to Date</button>
+        </div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <label class="form-label">Filter by Machine (optional)</label>
+        <select class="form-input" id="audit-machine">
+          <option value="">All Machines</option>
+        </select>
+      </div>
+      <div id="audit-preview" style="font-size:12px;color:var(--stone);font-family:'DM Mono',monospace;padding:8px 10px;background:var(--parchment);border-radius:6px;min-height:32px;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('maint-audit-modal')">Cancel</button>
+      <button class="btn-save" onclick="maintGenerateAuditReport()"><i class="ti ti-printer" style="font-size:13px;"></i> Generate &amp; Print</button>
+    </div>
+  </div>
+</div>
 
 
 <!-- MAINTENANCE: ADD MACHINE MODAL -->
@@ -3715,6 +3752,218 @@ function pmInit() {
 pmInit();
 
 
+
+
+// ================================================================
+// MAINTENANCE AUDIT REPORT MODULE
+// ================================================================
+
+function maintShowAuditModal() {
+  // Set defaults: from = 3 months ago, to = today
+  var today = new Date();
+  var from  = new Date(today);
+  from.setMonth(from.getMonth() - 3);
+  document.getElementById('audit-from').value = from.toISOString().slice(0,10);
+  document.getElementById('audit-to').value   = today.toISOString().slice(0,10);
+
+  // Populate machine dropdown
+  var sel  = document.getElementById('audit-machine');
+  var opts = '<option value="">All Machines</option>'
+    + maintMachines.map(function(m) {
+        return '<option value="' + m.id + '">' + mEsc(m.name) + '</option>';
+      }).join('');
+  sel.innerHTML = opts;
+
+  auditUpdatePreview();
+  document.getElementById('maint-audit-modal').classList.add('show');
+}
+
+function auditQuickSelect(months) {
+  var today = new Date();
+  var from  = new Date(today);
+  from.setMonth(from.getMonth() - months);
+  document.getElementById('audit-from').value = from.toISOString().slice(0,10);
+  document.getElementById('audit-to').value   = today.toISOString().slice(0,10);
+  auditUpdatePreview();
+}
+
+function auditQuickSelectYTD() {
+  var today = new Date();
+  var from  = new Date(today.getFullYear(), 0, 1);
+  document.getElementById('audit-from').value = from.toISOString().slice(0,10);
+  document.getElementById('audit-to').value   = today.toISOString().slice(0,10);
+  auditUpdatePreview();
+}
+
+function auditGetFilteredEntries() {
+  var from      = document.getElementById('audit-from').value;
+  var to        = document.getElementById('audit-to').value;
+  var machineId = document.getElementById('audit-machine').value;
+  return maintEntries.filter(function(e) {
+    if (from && e.date < from) return false;
+    if (to   && e.date > to)   return false;
+    if (machineId && e.machine_id !== machineId) return false;
+    return true;
+  });
+}
+
+function auditUpdatePreview() {
+  var entries = auditGetFilteredEntries();
+  var from    = document.getElementById('audit-from').value;
+  var to      = document.getElementById('audit-to').value;
+  var preview = document.getElementById('audit-preview');
+  if (!preview) return;
+  if (!from || !to) { preview.textContent = 'Select a date range.'; return; }
+  var machines = {};
+  entries.forEach(function(e) {
+    var name = (maintMachines.find(function(m) { return m.id === e.machine_id; }) || {}).name || 'Unknown';
+    machines[name] = (machines[name] || 0) + 1;
+  });
+  var machineList = Object.keys(machines).sort().map(function(n) { return n + ' (' + machines[n] + ')'; }).join(', ');
+  preview.textContent = entries.length + ' entries found'
+    + (entries.length ? ' — ' + machineList : '')
+    + '.';
+}
+
+// Listen for date/machine changes to update preview
+document.getElementById('audit-from').addEventListener('change', auditUpdatePreview);
+document.getElementById('audit-to').addEventListener('change', auditUpdatePreview);
+document.getElementById('audit-machine').addEventListener('change', auditUpdatePreview);
+
+function maintGenerateAuditReport() {
+  var entries   = auditGetFilteredEntries();
+  var from      = document.getElementById('audit-from').value;
+  var to        = document.getElementById('audit-to').value;
+  var machineId = document.getElementById('audit-machine').value;
+  var machineName = machineId
+    ? (maintMachines.find(function(m) { return m.id === machineId; }) || {}).name || 'Unknown'
+    : 'All Machines';
+
+  if (!entries.length) { alert('No entries found for the selected range.'); return; }
+
+  // Sort by date asc, then machine
+  entries = entries.slice().sort(function(a,b) {
+    if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+    var an = (maintMachines.find(function(m) { return m.id === a.machine_id; }) || {}).name || '';
+    var bn = (maintMachines.find(function(m) { return m.id === b.machine_id; }) || {}).name || '';
+    return an < bn ? -1 : an > bn ? 1 : 0;
+  });
+
+  // Group by date
+  var byDate = {};
+  entries.forEach(function(e) {
+    if (!byDate[e.date]) byDate[e.date] = [];
+    byDate[e.date].push(e);
+  });
+
+  var typeBadges = {
+    routine:    'background:#E4F0E4;color:#2C6B2F;',
+    repair:     'background:#FDF0D5;color:#8C5A0A;',
+    inspection: 'background:#E8EAF6;color:#3949AB;',
+    cleaning:   'background:#FCE4EC;color:#880E4F;',
+    other:      'background:#F5F0E8;color:#7A7568;'
+  };
+
+  var rows = '';
+  Object.keys(byDate).sort().forEach(function(date) {
+    var dayEntries = byDate[date];
+    var d = new Date(date + 'T00:00:00');
+    var dateLabel = d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+
+    rows += '<div style="margin-bottom:24px;break-inside:avoid;">';
+    rows += '<div style="background:#2C4A2E;color:#F5F0E8;padding:8px 14px;border-radius:6px 6px 0 0;font-family:\'Playfair Display\',serif;font-size:14px;font-weight:700;">' + dateLabel + '</div>';
+    rows += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+    rows += '<thead><tr style="background:#EDE5D0;">'
+      + '<th style="padding:7px 10px;text-align:left;border:1px solid #D4C9A8;font-family:monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#6B6B5A;width:18%;">Machine</th>'
+      + '<th style="padding:7px 10px;text-align:left;border:1px solid #D4C9A8;font-family:monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#6B6B5A;width:12%;">Type</th>'
+      + '<th style="padding:7px 10px;text-align:left;border:1px solid #D4C9A8;font-family:monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#6B6B5A;width:12%;">Technician</th>'
+      + '<th style="padding:7px 10px;text-align:left;border:1px solid #D4C9A8;font-family:monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#6B6B5A;">Work Performed</th>'
+      + '<th style="padding:7px 10px;text-align:left;border:1px solid #D4C9A8;font-family:monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#6B6B5A;width:14%;">Parts Used</th>'
+      + '</tr></thead><tbody>';
+
+    dayEntries.forEach(function(e, i) {
+      var mName  = (maintMachines.find(function(m) { return m.id === e.machine_id; }) || {}).name || 'Unknown';
+      var bg     = typeBadges[e.type] || typeBadges.other;
+      var rowBg  = i % 2 === 0 ? '#FFFFFF' : '#FAF7F2';
+      var workHtml = (e.work || '').replace(/\n/g, '<br>');
+      rows += '<tr style="background:' + rowBg + ';">'
+        + '<td style="padding:7px 10px;border:1px solid #E8DFC8;font-weight:600;color:#1A1A18;vertical-align:top;">' + mName + '</td>'
+        + '<td style="padding:7px 10px;border:1px solid #E8DFC8;vertical-align:top;"><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.05em;' + bg + '">' + (e.type||'other') + '</span></td>'
+        + '<td style="padding:7px 10px;border:1px solid #E8DFC8;color:#4A4A3A;vertical-align:top;">' + (e.tech || '—') + '</td>'
+        + '<td style="padding:7px 10px;border:1px solid #E8DFC8;color:#1A1A18;line-height:1.5;vertical-align:top;">' + workHtml + '</td>'
+        + '<td style="padding:7px 10px;border:1px solid #E8DFC8;color:#4A4A3A;vertical-align:top;">' + (e.parts || '—') + '</td>'
+        + '</tr>';
+    });
+
+    rows += '</tbody></table></div>';
+  });
+
+  // Summary stats
+  var totalEntries  = entries.length;
+  var uniqueMachines = [...new Set(entries.map(function(e) { return e.machine_id; }))].length;
+  var typeCounts = {};
+  entries.forEach(function(e) { typeCounts[e.type||'other'] = (typeCounts[e.type||'other']||0) + 1; });
+  var typeBreakdown = Object.keys(typeCounts).sort().map(function(t) {
+    return '<span style="font-size:11px;padding:2px 8px;border-radius:20px;margin-right:6px;' + (typeBadges[t]||typeBadges.other) + '">' + t + ': ' + typeCounts[t] + '</span>';
+  }).join('');
+
+  var fromLabel = new Date(from + 'T00:00:00').toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
+  var toLabel   = new Date(to   + 'T00:00:00').toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
+  var generated = new Date().toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
+
+  var html = '<!DOCTYPE html><html><head>'
+    + '<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+3:wght@400;600&family=DM+Mono&display=swap" rel="stylesheet">'
+    + '<style>'
+    + 'body{margin:0;padding:0;font-family:"Source Sans 3",sans-serif;color:#1A1A18;background:#fff;font-size:13px;}'
+    + '@page{margin:15mm 18mm;}'
+    + '.page{max-width:900px;margin:0 auto;padding:24px;}'
+    + '@media print{.no-print{display:none!important;}}'
+    + '</style>'
+    + '</head><body><div class="page">'
+
+    // Header
+    + '<div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #2C4A2E;padding-bottom:14px;margin-bottom:20px;">'
+    + '<div>'
+    + '<div style="font-family:\'Playfair Display\',serif;font-size:24px;font-weight:700;color:#2C4A2E;">Old Chatham Creamery</div>'
+    + '<div style="font-size:13px;color:#7A7568;letter-spacing:.1em;text-transform:uppercase;font-family:monospace;margin-top:3px;">Maintenance Audit Report</div>'
+    + '</div>'
+    + '<div style="text-align:right;">'
+    + '<div style="font-family:\'Playfair Display\',serif;font-size:14px;font-weight:600;">' + fromLabel + ' &mdash; ' + toLabel + '</div>'
+    + '<div style="font-size:11px;color:#7A7568;font-family:monospace;margin-top:3px;">Machine: ' + machineName + '</div>'
+    + '<div style="font-size:11px;color:#7A7568;font-family:monospace;margin-top:2px;">Generated: ' + generated + '</div>'
+    + '</div>'
+    + '</div>'
+
+    // Summary bar
+    + '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;">'
+    + '<div style="background:#F5F0E8;border:1px solid #E8DFC8;border-radius:8px;padding:12px 16px;border-top:3px solid #2C4A2E;">'
+    + '<div style="font-size:22px;font-family:\'Playfair Display\',serif;font-weight:700;color:#2C4A2E;">' + totalEntries + '</div>'
+    + '<div style="font-size:10px;font-family:monospace;color:#7A7568;text-transform:uppercase;letter-spacing:.08em;">Total Entries</div>'
+    + '</div>'
+    + '<div style="background:#F5F0E8;border:1px solid #E8DFC8;border-radius:8px;padding:12px 16px;border-top:3px solid #C4922A;">'
+    + '<div style="font-size:22px;font-family:\'Playfair Display\',serif;font-weight:700;color:#C4922A;">' + uniqueMachines + '</div>'
+    + '<div style="font-size:10px;font-family:monospace;color:#7A7568;text-transform:uppercase;letter-spacing:.08em;">Machines</div>'
+    + '</div>'
+    + '<div style="background:#F5F0E8;border:1px solid #E8DFC8;border-radius:8px;padding:12px 16px;border-top:3px solid #7A7568;">'
+    + '<div style="font-size:11px;font-family:monospace;color:#7A7568;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">By Type</div>'
+    + '<div>' + typeBreakdown + '</div>'
+    + '</div>'
+    + '</div>'
+
+    // Print button (no-print)
+    + '<div class="no-print" style="margin-bottom:16px;display:flex;gap:8px;">'
+    + '<button onclick="window.print()" style="padding:10px 20px;background:#2C4A2E;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">Print / Save as PDF</button>'
+    + '<button onclick="window.close()" style="padding:10px 20px;background:#EAF0EA;color:#2C4A2E;border:1px solid rgba(44,74,46,.3);border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">Close</button>'
+    + '</div>'
+
+    + rows
+    + '</div></body></html>';
+
+  closeModal('maint-audit-modal');
+  var win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+}
 
 </script>
 </body>
