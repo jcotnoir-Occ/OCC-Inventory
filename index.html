@@ -404,6 +404,7 @@
         <button class="btn btn-primary" onclick="pmNextMonth()"><i class="ti ti-chevron-right"></i></button>
         <button class="btn btn-primary" onclick="pmGoToday()">Today</button>
         <button class="btn btn-primary" onclick="pmShowAddForm()"><i class="ti ti-plus"></i> Add PM</button>
+        <button class="btn btn-primary" onclick="pmPrintDay(pmTodayStr())" title="Print today's checklist"><i class="ti ti-printer"></i> Print Today</button>
       </div>
     </div>
 
@@ -427,7 +428,10 @@
         <div id="pm-day-detail" style="display:none;margin-top:16px;" class="panel">
           <div class="panel-header" style="background:var(--forest);">
             <div class="panel-title" style="color:var(--cream);" id="pm-day-detail-title"></div>
-            <button onclick="document.getElementById('pm-day-detail').style.display='none'" style="background:none;border:none;color:var(--cream);cursor:pointer;font-size:16px;">×</button>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <button onclick="pmPrintDay(pmSelectedDay)" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);border-radius:5px;color:var(--cream);cursor:pointer;font-size:12px;padding:3px 10px;font-family:'DM Mono',monospace;"><i class="ti ti-printer"></i> Print</button>
+              <button onclick="document.getElementById('pm-day-detail').style.display='none'" style="background:none;border:none;color:var(--cream);cursor:pointer;font-size:16px;">×</button>
+            </div>
           </div>
           <div id="pm-day-detail-list" style="padding:4px 0;"></div>
         </div>
@@ -3617,6 +3621,91 @@ showInvSection = function(section) {
 };
 
 // ── Init ───────────────────────────────────────────────────────
+
+function pmPrintDay(dateStr) {
+  if (!dateStr) return;
+  var tasks = pmTasksDueOn(dateStr);
+  var d     = new Date(dateStr + 'T00:00:00');
+  var label = d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+
+  // Group tasks by machine
+  var byMachine = {};
+  tasks.forEach(function(t) {
+    var mName = pmMachineName(t.machine_id);
+    if (!byMachine[mName]) byMachine[mName] = [];
+    byMachine[mName].push(t);
+  });
+
+  var taskRows = '';
+  if (!tasks.length) {
+    taskRows = '<p style="color:#7A7568;font-style:italic;margin-top:12px;">No PM tasks scheduled for this day.</p>';
+  } else {
+    Object.keys(byMachine).sort().forEach(function(mName) {
+      taskRows += '<div style="margin-bottom:18px;">';
+      taskRows += '<div style="font-family:\'Playfair Display\',serif;font-size:14px;font-weight:700;color:#2C4A2E;border-bottom:2px solid #2C4A2E;padding-bottom:4px;margin-bottom:10px;">' + mName + '</div>';
+      byMachine[mName].forEach(function(t) {
+        var done = pmIsCompleted(t.id, dateStr);
+        var comp = pmCompletions.find(function(c) { return c.task_id === t.id && c.date === dateStr; });
+        taskRows += '<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #E8DFC8;">';
+        taskRows += '<div style="width:18px;height:18px;border:2px solid #2C4A2E;border-radius:3px;flex-shrink:0;margin-top:1px;background:' + (done ? '#2C4A2E' : '#fff') + ';display:flex;align-items:center;justify-content:center;">';
+        if (done) taskRows += '<span style="color:#fff;font-size:13px;font-weight:700;">&#10003;</span>';
+        taskRows += '</div>';
+        taskRows += '<div style="flex:1;">';
+        taskRows += '<div style="font-size:13px;font-weight:600;color:#1A1A18;">' + t.name + '</div>';
+        if (t.notes) taskRows += '<div style="font-size:11px;color:#7A7568;font-style:italic;margin-top:2px;">' + t.notes + '</div>';
+        taskRows += '<div style="font-size:11px;color:#7A7568;margin-top:4px;font-family:monospace;">' + pmRecurLabel(t) + '</div>';
+        taskRows += '</div>';
+        taskRows += '<div style="min-width:160px;border-bottom:1px solid #ccc;margin-top:14px;font-size:11px;color:#7A7568;">';
+        if (done && comp && comp.tech) {
+          taskRows += 'Completed by: ' + comp.tech;
+        } else if (done) {
+          taskRows += 'Completed';
+        } else {
+          taskRows += 'Completed by: _______________';
+        }
+        taskRows += '</div>';
+        taskRows += '</div>';
+      });
+      taskRows += '</div>';
+    });
+  }
+
+  var totalDone  = tasks.filter(function(t) { return pmIsCompleted(t.id, dateStr); }).length;
+  var totalCount = tasks.length;
+
+  var html = '<!DOCTYPE html><html><head>'
+    + '<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">'
+    + '<style>'
+    + 'body{margin:0;padding:0;font-family:"Source Sans 3",sans-serif;color:#1A1A18;background:#fff;}'
+    + '@page{margin:20mm 18mm;}'
+    + '.page{max-width:720px;margin:0 auto;padding:24px;}'
+    + '</style>'
+    + '</head><body><div class="page">'
+    + '<div style="border-bottom:3px solid #2C4A2E;padding-bottom:12px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-end;">'
+    + '<div>'
+    + '<div style="font-family:\'Playfair Display\',serif;font-size:22px;font-weight:700;color:#2C4A2E;">Old Chatham Creamery</div>'
+    + '<div style="font-size:13px;color:#7A7568;letter-spacing:.08em;text-transform:uppercase;font-family:monospace;margin-top:2px;">Daily PM Checklist</div>'
+    + '</div>'
+    + '<div style="text-align:right;">'
+    + '<div style="font-family:\'Playfair Display\',serif;font-size:15px;font-weight:600;color:#1A1A18;">' + label + '</div>'
+    + '<div style="font-size:12px;color:#7A7568;font-family:monospace;margin-top:2px;">' + totalDone + ' / ' + totalCount + ' completed</div>'
+    + '</div>'
+    + '</div>'
+    + taskRows
+    + '<div style="margin-top:32px;padding-top:12px;border-top:1px solid #E8DFC8;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">'
+    + '<div><div style="font-size:10px;color:#7A7568;text-transform:uppercase;letter-spacing:.08em;font-family:monospace;margin-bottom:20px;">Supervisor Signature</div><div style="border-bottom:1px solid #ccc;"></div></div>'
+    + '<div><div style="font-size:10px;color:#7A7568;text-transform:uppercase;letter-spacing:.08em;font-family:monospace;margin-bottom:20px;">Date</div><div style="border-bottom:1px solid #ccc;"></div></div>'
+    + '<div><div style="font-size:10px;color:#7A7568;text-transform:uppercase;letter-spacing:.08em;font-family:monospace;margin-bottom:20px;">Shift</div><div style="border-bottom:1px solid #ccc;"></div></div>'
+    + '</div>'
+    + '</div></body></html>';
+
+  var win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  win.onload = function() { win.print(); };
+}
+
+
 function pmInit() {
   pmLoadLocal();
   pmRefreshAllViews();
