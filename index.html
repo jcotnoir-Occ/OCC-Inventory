@@ -416,22 +416,22 @@
       </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;" id="pm-desktop-layout">
+    <div style="display:grid;grid-template-columns:1fr auto;gap:20px;align-items:start;" id="pm-desktop-layout">
 
       <!-- LEFT: Calendar -->
       <div>
         <!-- Day headers -->
-        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
-        <div style="display:grid;grid-template-columns:repeat(7,minmax(44px,1fr));gap:2px;margin-bottom:2px;min-width:308px;">
-          <div style="text-align:center;font-size:10px;font-weight:700;color:var(--stone);font-family:'DM Mono',monospace;padding:5px 0;">SUN</div>
-          <div style="text-align:center;font-size:10px;font-weight:700;color:var(--stone);font-family:'DM Mono',monospace;padding:5px 0;">MON</div>
-          <div style="text-align:center;font-size:10px;font-weight:700;color:var(--stone);font-family:'DM Mono',monospace;padding:5px 0;">TUE</div>
-          <div style="text-align:center;font-size:10px;font-weight:700;color:var(--stone);font-family:'DM Mono',monospace;padding:5px 0;">WED</div>
-          <div style="text-align:center;font-size:10px;font-weight:700;color:var(--stone);font-family:'DM Mono',monospace;padding:5px 0;">THU</div>
-          <div style="text-align:center;font-size:10px;font-weight:700;color:var(--stone);font-family:'DM Mono',monospace;padding:5px 0;">FRI</div>
-          <div style="text-align:center;font-size:10px;font-weight:700;color:var(--stone);font-family:'DM Mono',monospace;padding:5px 0;">SAT</div>
+        <div style="width:100%;">
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:2px;">
+          <div style="text-align:center;font-size:10px;font-weight:700;color:var(--stone);font-family:'DM Mono',monospace;padding:5px 0;">S</div>
+          <div style="text-align:center;font-size:10px;font-weight:700;color:var(--stone);font-family:'DM Mono',monospace;padding:5px 0;">M</div>
+          <div style="text-align:center;font-size:10px;font-weight:700;color:var(--stone);font-family:'DM Mono',monospace;padding:5px 0;">T</div>
+          <div style="text-align:center;font-size:10px;font-weight:700;color:var(--stone);font-family:'DM Mono',monospace;padding:5px 0;">W</div>
+          <div style="text-align:center;font-size:10px;font-weight:700;color:var(--stone);font-family:'DM Mono',monospace;padding:5px 0;">T</div>
+          <div style="text-align:center;font-size:10px;font-weight:700;color:var(--stone);font-family:'DM Mono',monospace;padding:5px 0;">F</div>
+          <div style="text-align:center;font-size:10px;font-weight:700;color:var(--stone);font-family:'DM Mono',monospace;padding:5px 0;">S</div>
         </div>
-        <div id="pm-calendar-grid" style="display:grid;grid-template-columns:repeat(7,minmax(44px,1fr));gap:2px;min-width:308px;"></div>
+        <div id="pm-calendar-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;width:100%;"></div>
         </div>
 
         <!-- Day detail panel -->
@@ -3288,7 +3288,7 @@ function pmRenderCalendar() {
   var html = '';
   // Empty cells before first day
   for (var i = 0; i < firstDay; i++) {
-    html += '<div style="min-height:80px;background:var(--parchment);border-radius:6px;opacity:.3;"></div>';
+    html += '<div style="min-height:60px;background:var(--parchment);border-radius:6px;opacity:.3;"></div>';
   }
 
   for (var d = 1; d <= daysInMonth; d++) {
@@ -3303,7 +3303,7 @@ function pmRenderCalendar() {
     var border = selected ? '2px solid #2C4A2E' : (isToday ? '2px solid #2C4A2E' : '1px solid var(--border)');
     var dayColor = selected ? '#fff' : (isToday ? '#2C4A2E' : 'var(--charcoal)');
 
-    html += '<div onclick="pmSelectDay(\'' + ds + '\')" style="min-height:80px;background:' + bg + ';border:' + border + ';border-radius:6px;padding:6px;cursor:' + (tasks.length ? 'pointer' : 'default') + ';transition:all .15s;">';
+    html += '<div onclick="pmSelectDay(\'' + ds + '\')" style="min-height:60px;background:' + bg + ';border:' + border + ';border-radius:6px;padding:6px;cursor:' + (tasks.length ? 'pointer' : 'default') + ';transition:all .15s;">';
     html += '<div style="font-size:12px;font-weight:700;color:' + dayColor + ';margin-bottom:4px;">' + d + '</div>';
 
     if (doneAll) {
