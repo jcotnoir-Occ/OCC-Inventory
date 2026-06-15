@@ -180,7 +180,7 @@
     .page.active{display:block;}
   
 @media (max-width: 700px) {
-  /* Header - single compact line */
+  /* Header */
   .header { padding: 0 10px !important; height: 52px !important; min-height: 52px !important; }
   .sheep-logo { width: 32px !important; height: 32px !important; flex-shrink: 0; }
   .sheep-logo svg { width: 20px !important; height: 20px !important; }
@@ -190,15 +190,22 @@
   .badge-live { display: none !important; }
   #sync-indicator { display: none !important; }
   #fs-btn { display: none !important; }
-  /* Nav tabs - scrollable, no wrapping */
+  /* Nav tabs */
   .nav-tabs { padding: 0 2px !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; scrollbar-width: none !important; flex-wrap: nowrap !important; }
   .nav-tabs::-webkit-scrollbar { display: none !important; }
   .nav-tab { padding: 8px 12px !important; font-size: 11px !important; white-space: nowrap !important; flex-shrink: 0 !important; }
   /* Main content */
-  .main { padding: 10px !important; overflow-x: hidden !important; }
+  .main { padding: 6px !important; overflow-x: hidden !important; }
   .section-header { flex-wrap: wrap; gap: 8px; }
-  /* PM Calendar - make it fit on mobile */
-  #pm-calendar-grid, #pm-calendar-grid + div { font-size: 10px !important; }
+  /* PM page - zero padding so calendar is truly full width */
+  #page-pm { padding: 0 !important; }
+  #page-pm .section-header { padding: 8px 8px 0 8px !important; margin-bottom: 8px !important; }
+  #pm-desktop-layout { padding: 0 4px !important; grid-template-columns: 1fr !important; }
+  #pm-desktop-layout > div:last-child { display: none; }
+  #pm-form-panel { position: static !important; display: block !important; }
+  #page-pm > .panel { margin: 0 4px 8px !important; }
+  /* Calendar cells */
+  #pm-calendar-grid > div { font-size: 9px !important; padding: 3px 2px !important; min-height: 55px !important; }
 }
 
 </style>
@@ -3303,7 +3310,7 @@ function pmRenderCalendar() {
     var border = selected ? '2px solid #2C4A2E' : (isToday ? '2px solid #2C4A2E' : '1px solid var(--border)');
     var dayColor = selected ? '#fff' : (isToday ? '#2C4A2E' : 'var(--charcoal)');
 
-    html += '<div onclick="pmSelectDay(\'' + ds + '\')" style="min-height:60px;background:' + bg + ';border:' + border + ';border-radius:6px;padding:6px;cursor:' + (tasks.length ? 'pointer' : 'default') + ';transition:all .15s;">';
+    html += '<div onclick="pmSelectDay(\'' + ds + '\')" style="min-height:60px;box-sizing:border-box;overflow:hidden;background:' + bg + ';border:' + border + ';border-radius:4px;padding:3px 2px;cursor:' + (tasks.length ? 'pointer' : 'default') + ';transition:all .15s;">';
     html += '<div style="font-size:12px;font-weight:700;color:' + dayColor + ';margin-bottom:4px;">' + d + '</div>';
 
     if (doneAll) {
