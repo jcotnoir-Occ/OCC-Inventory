@@ -3352,7 +3352,10 @@ function pmSelectDay(ds) {
       + '<div style="font-size:14px;font-weight:600;color:var(--charcoal);' + (done?'text-decoration:line-through;':'') + '">' + mEsc(t.name) + '</div>'
       + '<div style="font-size:12px;color:var(--stone);font-family:\'DM Mono\',monospace;margin-top:2px;">' + mEsc(pmMachineName(t.machine_id)) + ' &middot; ' + pmRecurLabel(t) + '</div>'
       + (t.notes ? '<div style="font-size:12px;color:var(--stone);margin-top:4px;font-style:italic;">' + mEsc(t.notes) + '</div>' : '')
-      + (done ? '<div style="font-size:11px;color:var(--forest);margin-top:4px;font-weight:600;">&#10003; Completed by: ' + mEsc((pmCompletions.find(function(c){return c.task_id===t.id&&c.date===ds;})||{}).tech||'Unknown') + '</div>' : '')
+      + (done ? (function(){ var cc=pmCompletions.find(function(c){return c.task_id===t.id&&c.date===ds;})||{};
+          return '<div style="font-size:11px;color:var(--forest);margin-top:4px;font-weight:600;">&#10003; Completed by: ' + mEsc(cc.tech||'Unknown') + '</div>'
+            + (cc.parts ? '<div style="font-size:11px;color:var(--stone);margin-top:2px;">&#128295; Parts: ' + mEsc(cc.parts) + '</div>' : '');
+        })() : '')
       + '</label>'
       + '</div>';
   }).join('');
@@ -3490,7 +3493,80 @@ function pmRefreshAllViews() {
 }
 
 // ── Toggle complete ────────────────────────────────────────────
-function pmToggleComplete(taskId, dateStr) {
+
+function pmShowCompletionDialog(taskName, defaultTech) {
+  // Create overlay
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;';
+
+  var box = document.createElement('div');
+  box.style.cssText = 'background:#F5F0E8;border-radius:12px;padding:22px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.3);font-family:"Source Serif 4",Georgia,serif;';
+
+  box.innerHTML = ''
+    + '<div style="font-family:Georgia,serif;font-size:16px;font-weight:700;color:#2C4A2E;margin-bottom:4px;">Complete PM Task</div>'
+    + '<div style="font-size:13px;color:#7A7568;margin-bottom:16px;">' + taskName + '</div>'
+    + '<div style="margin-bottom:12px;">'
+    + '<label style="display:block;font-size:10px;font-weight:700;color:#7A7568;text-transform:uppercase;letter-spacing:.08em;font-family:monospace;margin-bottom:5px;">Completed By *</label>'
+    + '<input id="pm-dialog-tech" type="text" value="' + defaultTech + '" placeholder="Your name" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid rgba(44,74,46,.3);border-radius:7px;font-size:14px;background:#fff;outline:none;font-family:Georgia,serif;">'
+    + '</div>'
+    + '<div style="margin-bottom:18px;">'
+    + '<label style="display:block;font-size:10px;font-weight:700;color:#7A7568;text-transform:uppercase;letter-spacing:.08em;font-family:monospace;margin-bottom:5px;">Parts / Materials Used <span style="font-weight:400;text-transform:none;">(optional)</span></label>'
+    + '<input id="pm-dialog-parts" type="text" placeholder="e.g. 40 lbs water softener salt, O-ring" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid rgba(44,74,46,.3);border-radius:7px;font-size:14px;background:#fff;outline:none;font-family:Georgia,serif;">'
+    + '</div>'
+    + '<div style="display:flex;gap:10px;">'
+    + '<button id="pm-dialog-cancel" style="flex:1;padding:11px;background:#EAF0EA;color:#2C4A2E;border:1px solid rgba(44,74,46,.3);border-radius:7px;font-size:14px;font-weight:600;cursor:pointer;font-family:Georgia,serif;">Cancel</button>'
+    + '<button id="pm-dialog-save" style="flex:1;padding:11px;background:#2C4A2E;color:#F5F0E8;border:none;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer;font-family:Georgia,serif;">Save</button>'
+    + '</div>';
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  // Focus the tech field
+  setTimeout(function() {
+    var techEl = document.getElementById('pm-dialog-tech');
+    if (techEl) { techEl.focus(); techEl.select(); }
+  }, 50);
+
+  // Return a promise-like result via synchronous flag
+  var result = null;
+  var resolved = false;
+
+  return new Promise(function(resolve) {
+    document.getElementById('pm-dialog-save').addEventListener('click', function() {
+      var tech  = document.getElementById('pm-dialog-tech').value;
+      var parts = document.getElementById('pm-dialog-parts').value;
+      document.body.removeChild(overlay);
+      resolve({ tech: tech, parts: parts });
+    });
+    document.getElementById('pm-dialog-cancel').addEventListener('click', function() {
+      document.body.removeChild(overlay);
+      resolve(null);
+    });
+    // Close on overlay click
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) {
+        document.body.removeChild(overlay);
+        resolve(null);
+      }
+    });
+    // Enter key saves
+    box.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        var tech  = document.getElementById('pm-dialog-tech').value;
+        var parts = document.getElementById('pm-dialog-parts').value;
+        document.body.removeChild(overlay);
+        resolve({ tech: tech, parts: parts });
+      }
+      if (e.key === 'Escape') {
+        document.body.removeChild(overlay);
+        resolve(null);
+      }
+    });
+  });
+}
+
+
+async function pmToggleComplete(taskId, dateStr) {
   var already = pmIsCompleted(taskId, dateStr);
   if (already) {
     // Uncheck - remove completion AND the matching maintenance log entry
@@ -3513,17 +3589,21 @@ function pmToggleComplete(taskId, dateStr) {
     pmRefreshAllViews();
     pmDeleteCompletionCloud(taskId, dateStr);
   } else {
-    // Ask for technician name before saving
+    // Show completion dialog
     var savedTech = localStorage.getItem('occ_pm_last_tech') || '';
-    var tech = prompt('Who is completing this task?', savedTech);
-    if (tech === null) {
-      // User cancelled - uncheck the checkbox visually by re-rendering
+    var task = pmTasks.find(function(t) { return t.id === taskId; });
+    var taskName = task ? task.name : 'this task';
+
+    // Build a simple modal-style prompt using a div overlay
+    var result = await pmShowCompletionDialog(taskName, savedTech);
+    if (result === null) {
       pmRefreshAllViews();
       return;
     }
-    tech = tech.trim();
+    var tech  = (result.tech  || '').trim();
+    var parts = (result.parts || '').trim();
     if (tech) localStorage.setItem('occ_pm_last_tech', tech);
-    var comp = { id: maintGenId(), task_id: taskId, date: dateStr, tech: tech, completed_at: new Date().toISOString() };
+    var comp = { id: maintGenId(), task_id: taskId, date: dateStr, tech: tech, parts: parts, completed_at: new Date().toISOString() };
     pmCompletions.push(comp);
     pmSaveLocal();
     pmRefreshAllViews();
@@ -3532,7 +3612,7 @@ function pmToggleComplete(taskId, dateStr) {
     var task = pmTasks.find(function(t) { return t.id === taskId; });
     if (task && task.machine_id) {
       var entry = { id: maintGenId(), machine_id: task.machine_id, date: dateStr, tech: tech, type: 'routine',
-        work: 'PM: ' + task.name + (task.notes ? '\n' + task.notes : ''), parts: '', created_at: new Date().toISOString() };
+        work: 'PM: ' + task.name + (task.notes ? '\n' + task.notes : ''), parts: parts || '', created_at: new Date().toISOString() };
       maintEntries.unshift(entry);
       maintSaveLocal();
       maintRefreshAllViews();
