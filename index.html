@@ -1157,10 +1157,8 @@ async function loadInventory(){
         filterTable(); updateCounts();
         return;
       }
-      // Supabase table is empty — seed it with defaults
+      // Supabase table is empty — start with empty inventory
       inventoryData.length=0;
-      DEFAULT_INVENTORY.forEach(function(r){ inventoryData.push(Object.assign({},r)); });
-      await pushAllToSupabase();
       lsSave();
       setSyncStatus('ok'); setTimeout(function(){ setSyncStatus('idle'); },2000);
       filterTable(); updateCounts();
@@ -1173,11 +1171,11 @@ async function loadInventory(){
   // No Supabase or failed — use localStorage or defaults
   var local=lsLoad();
   inventoryData.length=0;
-  (local||DEFAULT_INVENTORY.map(function(r){return Object.assign({},r);})).forEach(function(r){ inventoryData.push(r); });
+  (local||[]).forEach(function(r){ inventoryData.push(r); });
   filterTable(); updateCounts();
 }
 
-var inventoryData=lsLoad()||DEFAULT_INVENTORY.map(function(r){return Object.assign({},r);});
+var inventoryData=lsLoad()||[];
 
 // ── Real-time polling — refresh from Supabase every 5s ──
 var _pollInterval=null;
@@ -1751,7 +1749,6 @@ function confirmResetInventory(){
   if(confirm('Reset inventory to default data? This will discard all changes.')){
     localStorage.removeItem(STORAGE_KEY);
     inventoryData.length=0;
-    DEFAULT_INVENTORY.forEach(function(r){inventoryData.push(Object.assign({},r));});
     if(useSupabase){ setSyncStatus('syncing'); pushAllToSupabase().then(function(){ setSyncStatus('ok'); setTimeout(function(){ setSyncStatus('idle'); },2000); }).catch(function(){ setSyncStatus('error'); }); }
     filterTable();
     updateCounts();
